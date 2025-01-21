@@ -6,6 +6,8 @@ from queue import Queue
 from threading import Lock
 import time
 
+USER_AGENT = "SWAP/1.0 (Educational project)"
+
 
 def normalize_url(url):
 	return url.rstrip("/")
@@ -41,7 +43,8 @@ class Worker(threading.Thread):
 			self.visited.add(normalized_url)
 
 		try:
-			response = requests.get(current_url)
+			headers = {"User-Agent": USER_AGENT}
+			response = requests.get(current_url, headers=headers)
 			soup = BeautifulSoup(response.text, "html.parser")
 			print(f"Crawling: {current_url} (depth: {depth})")
 
