@@ -1,2 +1,3 @@
-# swap
+# SWAP
+
 Software Architecture Project - search engine.
