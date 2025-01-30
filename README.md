@@ -1,3 +1,8 @@
-# SWAP
+# Software Architecture Project
 
-Software Architecture Project - search engine.
+** simple description of project **
+
+Temp quick links:
+
+- [Crawler setup](./webcrawler/README.md)
+- [k8s setup](./k8s/README.md)

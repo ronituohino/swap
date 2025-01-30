@@ -1,0 +1,24 @@
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+metadata:
+  name: swap-cluster
+servers: 1
+agents: 2
+image: rancher/k3s:v1.31.2-k3s1
+network: swap-cluster-network
+ports:
+  - port: 8081:80
+    nodeFilters:
+      - loadbalancer
+  - port: 8082:8082
+    nodeFilters:
+      - loadbalancer
+options:
+  k3s:
+    extraArgs:
+      - arg: --disable=traefik # Disable traefik which is by default installed with k3d because we want it in declarative way
+        nodeFilters:
+          - server:*
+  kubeconfig:
+    updateDefaultKubeconfig: true
+    switchCurrentContext: true

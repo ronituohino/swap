@@ -1,0 +1,10 @@
+version: 1.0.0-rc.8
+dependencies:
+- name: bitnamicharts/rabbitmq
+  repository: oci://registry-1.docker.io
+  version: 15.2.4
+- name: traefik
+  repository: https://traefik.github.io/charts
+  version: 34.2.0
+digest: sha256:ed7915a0471f27930df159beaf98f265e337108923cc1e99cdf4eb46b0455b4a
+generated: 2025-01-30T12:55:23.213809342+02:00

@@ -1,0 +1,5 @@
+replicaCount: 3
+auth:
+  username: "user"
+  password: "password"
+  erlangCookie: "erlang_cookie"

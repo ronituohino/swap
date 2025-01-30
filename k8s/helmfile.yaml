@@ -1,0 +1,21 @@
+environments:
+  dev: {}
+  prod: {}
+---
+repositories:
+  - name: traefik
+    url: https://traefik.github.io/charts
+  - name: docker-oci
+    url: registry-1.docker.io
+    oci: true
+
+releases:
+  - name: traefik
+    namespace: kube-system
+    chart: traefik/traefik
+
+  - name: rabbitmq
+    namespace: rabbitmq
+    chart: docker-oci/bitnamicharts/rabbitmq
+    values:
+      - overlays/{{ .Environment.Name }}/values/rabbitmq.yaml
