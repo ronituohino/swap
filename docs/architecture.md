@@ -86,7 +86,7 @@ We use [Postgres](https://www.postgresql.org/) to store our search index.
 The database would have 3 tables:
 - `websites`
 - `keywords`
-- `references`
+- `relations`
 
 The database should be optimized using [indexes](https://www.postgresql.org/docs/current/indexes.html).
 
