@@ -18,4 +18,4 @@ releases:
     namespace: rabbitmq
     chart: docker-oci/bitnamicharts/rabbitmq
     values:
-      - overlays/{{ .Environment.Name }}/values/rabbitmq.yaml
+      - overlays/{{ .Environment.Name }}/manifests/rabbitmq/values.yaml

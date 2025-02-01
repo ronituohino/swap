@@ -13,7 +13,7 @@
 - `k3d cluster create --config k3d-cluster.yaml`
 - `helmfile -e dev init`
 - `helmfile -e dev apply`
-- `kubectl kustomize overlays/dev | kubectl apply -f -` -- does not yet contain anything
+- `kubectl kustomize overlays/dev | kubectl apply -f -`
 
 ## Updating cluster
 

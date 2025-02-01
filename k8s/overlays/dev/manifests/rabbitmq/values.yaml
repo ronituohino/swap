@@ -1,5 +1,5 @@
 replicaCount: 3
 auth:
-  username: "user"
+  username: "rmq_user"
   password: "password"
   erlangCookie: "erlang_cookie"

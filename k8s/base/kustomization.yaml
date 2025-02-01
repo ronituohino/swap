@@ -1,2 +1,22 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+
+images:
+  - name: API-IMAGE
+    newName: registry/image:tag
+  - name: INDEXER-IMAGE
+    newName: registry/image:tag
+
+resources:
+  - manifests/api/deployment.yaml
+  - manifests/api/service.yaml
+
+  - manifests/indexer/deployment.yaml
+  - manifests/indexer/service.yaml
+
+  - manifests/postgres/configmap.yaml
+  - manifests/postgres/deployment.yaml
+  - manifests/postgres/pvc.yaml
+  - manifests/postgres/service.yaml
+
+  - manifests/rabbitmq/configmap.yaml

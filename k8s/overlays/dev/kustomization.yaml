@@ -5,3 +5,7 @@ namespace: swap-dev
 resources:
   - ../../base
   - namespace.yaml
+
+  - manifests/postgres/secret.yaml
+
+  - manifests/rabbitmq/secret.yaml
