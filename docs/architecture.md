@@ -6,6 +6,8 @@ The design follows the Microservices pattern language, with inherent traits of s
 The search engine has three major parts: Crawling, Indexing, and Serving.  
 Some parts of the application are in a Kubernetes cluster, while others are run on separate devices.  
 
+![architecture](./architecture.png)
+
 ## Crawling
 
 The crawler is implemented in [../webcrawler](../webcrawler/).  
@@ -20,6 +22,7 @@ _Workflow:_
   - Check if we can crawl this page (is https, robots.txt rules, language="en")
   - If yes, scan the page for words
   - Then [lemmatize](https://en.wikipedia.org/wiki/Lemmatization) the words using a lookup from [this dictionary](https://github.com/michmech/lemmatization-lists/blob/master/lemmatization-en.txt)
+  - Then remove words that do not provide value, like ["and", "then", "is", "I"](https://en.wikipedia.org/wiki/Most_common_words_in_English)...
   - Assemble a list of most common words in this page, cut off words that are rare
   - Send a message to a RabbitMQ topic ("text")
 
