@@ -24,20 +24,20 @@ SCHEDULER_MEMORY_QUEUE = "scrapy.squeues.FifoMemoryQueue"
 # Also contains few other changes as per the docs
 ### !!! ###
 
-BOT_NAME = "webcrawler"
+BOT_NAME = "swap-crawler"
 
 SPIDER_MODULES = ["src.spiders"]
 NEWSPIDER_MODULE = "src.spiders"
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-# USER_AGENT = "webcrawler (+http://www.yourdomain.com)"
+USER_AGENT = "swap-crawler/0.0.1 (+https://ronituohino.github.io/swap/)"
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-CONCURRENT_REQUESTS = 100
+CONCURRENT_REQUESTS = 16
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay

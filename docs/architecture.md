@@ -21,8 +21,10 @@ _Workflow:_
 - Whenever it encounters a new web page:
   - Check if we can crawl this page (is https, robots.txt rules, language="en")
   - If yes, scan the page for words
-  - Then [lemmatize](https://en.wikipedia.org/wiki/Lemmatization) the words using a lookup from [this dictionary](https://github.com/michmech/lemmatization-lists/blob/master/lemmatization-en.txt)
-  - Then remove words that do not provide value, like ["and", "then", "is", "I"](https://en.wikipedia.org/wiki/Most_common_words_in_English)...
+  - Transform all words into lowercase
+  - Then remove words with a single letter, like "i", "a" ...,
+  - Then remove words that do not provide value, like ["and", "then", "is"](https://en.wikipedia.org/wiki/Most_common_words_in_English)...
+  - Then [lemmatize](https://en.wikipedia.org/wiki/Lemmatization) the remaining words using a lookup from [this dictionary](https://github.com/michmech/lemmatization-lists/blob/master/lemmatization-en.txt)
   - Assemble a list of most common words in this page, cut off words that are rare
   - Send a message to a RabbitMQ topic ("text")
 

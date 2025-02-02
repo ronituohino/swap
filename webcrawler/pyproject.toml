@@ -1,8 +1,6 @@
 [project]
-name = "WebCrawler"
+name = "swap-crawler"
 version = "0.0.1"
 description = "Simple web crawler"
 requires-python = ">=3.10"
-dependencies = [
-  "scrapy>=2.12.0"
-]
+dependencies = ["scrapy>=2.12.0"]
