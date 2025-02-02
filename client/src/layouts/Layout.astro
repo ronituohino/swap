@@ -1,0 +1,104 @@
+---
+// Supports weights 200-900
+import '@fontsource-variable/nunito';
+
+const title = "SWAP Search";
+const description =
+  "SWAP Search is a search engine school project for University of Helsinki.";
+/* const ogHref = `${Astro.site}og.png`; */
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		{/* link rel="manifest" href="/manifest.json" /> mobile icons */}
+    <link rel="canonical" href={Astro.site} />
+
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		{/* <meta name="image" content={ogHref} /> og image for seo */}
+		<link rel="icon" type="image/x-icon"href="/favicon.ico" />
+
+		{/* Og metadata */}
+		<meta property="og:title" content={title} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={Astro.site} />
+    {/* <meta property="og:image" content={ogHref} /> og image for seo */}
+		<meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content={title} />
+    <meta property="og:description" content={description} />
+
+		<link rel="sitemap" href="/sitemap-index.xml" />
+		<meta name="generator" content={Astro.generator} />
+	</head>
+	<body>
+		<slot />
+	</body>
+</html>
+
+<style is:global>
+	* {
+		box-sizing: border-box;
+		margin: 0;
+		padding: 0;
+		border: 0;
+	}
+
+	ul,
+	li {
+		list-style-type: none;
+	}
+
+	button {
+		cursor: pointer;
+	}
+
+	a {
+		text-decoration: none;
+		color: var(--link-col);
+	}
+	a:visited {
+		color: var(--link-visited-col);
+	}
+	a:hover,
+	a:focus-visible {
+		color: var(--link-hover-col);
+	}
+	a:active {
+		color: var(--link-active-col);
+	}
+
+	img {
+		height: auto;
+		max-width: 100%;
+		vertical-align: middle;
+		font-style: italic;
+	}
+</style>
+
+<style>
+	:root {
+		--bg-col: #252525;
+		--bg-line-col: #2b2b2b;
+
+		--box-col: rgb(255, 132, 75);
+		color: rgb(20, 20, 20);
+
+		--link-col: rgb(0, 17, 252);
+		--link-visited-col: rgb(121, 0, 219);
+		--link-hover-col: rgb(51, 65, 255);
+		--link-active-col: rgb(109, 119, 255);
+	}
+
+	html {
+		font-family: 'Nunito Variable', sans-serif;
+	}
+	body {
+		background-color: var(--bg-col);
+		background-image:  linear-gradient(var(--bg-line-col) 2px, transparent 2px), linear-gradient(90deg, var(--bg-line-col) 2px, transparent 2px), linear-gradient(var(--bg-line-col) 1px, transparent 1px), linear-gradient(90deg, var(--bg-line-col) 1px, var(--bg-col) 1px);
+		background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
+		background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
+	}
+</style>
