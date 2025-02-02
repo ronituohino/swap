@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://ronituohino.github.pages/swap/sitemap-index.xml

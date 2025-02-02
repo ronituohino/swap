@@ -5,7 +5,6 @@ import '@fontsource-variable/nunito';
 const title = "SWAP Search";
 const description =
   "SWAP Search is a search engine school project for University of Helsinki.";
-/* const ogHref = `${Astro.site}og.png`; */
 ---
 
 <!doctype html>
@@ -14,18 +13,16 @@ const description =
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		{/* link rel="manifest" href="/manifest.json" /> mobile icons */}
-    <link rel="canonical" href={Astro.site} />
+    <link rel="canonical" href="https://ronituohino.github.io/swap" />
 
 		<title>{title}</title>
 		<meta name="description" content={description} />
-		{/* <meta name="image" content={ogHref} /> og image for seo */}
-		<link rel="icon" type="image/x-icon"href="/favicon.ico" />
+		<link rel="icon" type="image/x-icon"href="/swap/favicon.ico" />
 
 		{/* Og metadata */}
 		<meta property="og:title" content={title} />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content={Astro.site} />
-    {/* <meta property="og:image" content={ogHref} /> og image for seo */}
+    <meta property="og:url" content="https://ronituohino.github.io/swap" />
 		<meta property="og:locale" content="en_US" />
     <meta property="og:site_name" content={title} />
     <meta property="og:description" content={description} />
