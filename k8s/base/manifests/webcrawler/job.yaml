@@ -6,6 +6,7 @@ metadata:
     app: webcrawler
 spec:
   ttlSecondsAfterFinished: 60
+  suspend: false
   template:
     metadata:
       labels:
@@ -14,4 +15,9 @@ spec:
       containers:
         - name: webcrawler
           image: WEBCRAWLER-IMAGE
+          args:
+            - -s
+            - CLOSESPIDER_PAGECOUNT=100
+            - -s
+            - CLOSESPIDER_TIMEOUT=45
       restartPolicy: Never

@@ -29,10 +29,6 @@ func main() {
 		c.JSON(http.StatusOK, results)
 	})
 
-	r.GET("/crawler", func(c *gin.Context) {
-		// HERE
-	})
-
 	fmt.Printf("Server started in port %v\n", port)
 	r.Run(fmt.Sprintf(":%v", port))
 }

@@ -15,6 +15,10 @@
 - `helmfile -e dev apply`
 - `chmod +x ./local-deploy.sh && ./local-deploy.sh`
 
+## Running crawler
+
+- `./local-deploy.sh -w` - uses args defined in [webcrawler job](../k8s/base/manifests/webcrawler/job.yaml)
+
 ## Updating cluster
 
 #### Helm changes
