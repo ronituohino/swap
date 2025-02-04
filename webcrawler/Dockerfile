@@ -8,4 +8,4 @@ COPY . .
 
 RUN uv sync --frozen --no-dev
 
-CMD ["uv", "run", "scrapy", "crawl", "infinite"]
+CMD ["uv", "run", "scrapy", "crawl", "infinite", "-s", "CLOSESPIDER_TIMEOUT=45"]

@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: webcrawler
+  labels:
+    app: webcrawler
+spec:
+  ttlSecondsAfterFinished: 60
+  template:
+    metadata:
+      labels:
+        app: webcrawler
+    spec:
+      containers:
+        - name: webcrawler
+          image: WEBCRAWLER-IMAGE
+      restartPolicy: Never

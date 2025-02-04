@@ -22,10 +22,6 @@
 - `helmfile deps`
 - `helmfile sync`
 
-#### Kustomization changes
-
-- `kubectl kustomize overlays/dev | kubectl apply -f -`
-
-#### Local docker source changes
+#### Kustomization or source changes changes
 
 - `./local-deploy.sh`

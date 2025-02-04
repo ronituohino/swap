@@ -8,6 +8,9 @@ images:
   - name: INDEXER-IMAGE
     newName: ronituohino/swap-search
     newTag: indexer
+  - name: WEBCRAWLER-IMAGE
+    newName: ronituohino/swap-search
+    newTag: webcrawler
 
 resources:
   - manifests/api/deployment.yaml
@@ -21,3 +24,7 @@ resources:
   - manifests/postgres/service.yaml
 
   - manifests/rabbitmq/configmap.yaml
+
+  - manifests/webcrawler/job.yaml
+
+  - manifests/ingress.yaml
