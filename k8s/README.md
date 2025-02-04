@@ -13,7 +13,7 @@
 - `k3d cluster create --config k3d-cluster.yaml`
 - `helmfile -e dev init`
 - `helmfile -e dev apply`
-- `kubectl kustomize overlays/dev | kubectl apply -f -`
+- `chmod +x ./local-deploy.sh && ./local-deploy.sh`
 
 ## Updating cluster
 
@@ -25,3 +25,7 @@
 #### Kustomization changes
 
 - `kubectl kustomize overlays/dev | kubectl apply -f -`
+
+#### Local docker source changes
+
+- `./local-deploy.sh`

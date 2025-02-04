@@ -3,5 +3,6 @@ kind: ConfigMap
 metadata:
   name: rabbitmq-configmap
 data:
-  RMQ_ADDR: rabbitmq.rabbitmq:5672
   RMQ_USER: rmq_user
+  RMQ_HOST: rabbitmq.rabbitmq
+  RMQ_PORT: "5672"

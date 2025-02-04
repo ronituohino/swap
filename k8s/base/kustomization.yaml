@@ -3,9 +3,11 @@ kind: Kustomization
 
 images:
   - name: API-IMAGE
-    newName: registry/image:tag
+    newName: ronituohino/swap-search
+    newTag: api
   - name: INDEXER-IMAGE
-    newName: registry/image:tag
+    newName: ronituohino/swap-search
+    newTag: indexer
 
 resources:
   - manifests/api/deployment.yaml
@@ -16,7 +18,6 @@ resources:
 
   - manifests/postgres/configmap.yaml
   - manifests/postgres/deployment.yaml
-  - manifests/postgres/pvc.yaml
   - manifests/postgres/service.yaml
 
   - manifests/rabbitmq/configmap.yaml

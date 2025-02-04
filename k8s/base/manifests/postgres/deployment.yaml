@@ -1,8 +1,9 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: postgres
 spec:
+  serviceName: postgres-svc
   replicas: 1
   selector:
     matchLabels:
@@ -14,7 +15,7 @@ spec:
     spec:
       containers:
         - name: postgres
-          image: postgres:17.0-alpine3.20
+          image: postgres:17.2-alpine3.20
           ports:
             - containerPort: 5432
           envFrom:
@@ -25,7 +26,12 @@ spec:
           volumeMounts:
             - name: postgres-storage
               mountPath: /var/lib/postgresql/data
-      volumes:
-        - name: postgres-storage
-          persistentVolumeClaim:
-            claimName: postgres-pvc
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-storage
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: local-path
+        resources:
+          requests:
+            storage: 10Gi

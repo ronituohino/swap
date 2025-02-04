@@ -24,3 +24,9 @@ spec:
                 name: rabbitmq-configmap
             - secretRef:
                 name: rabbitmq-secret
+          readinessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            httpGet:
+              path: /healthz
+              port: 3000

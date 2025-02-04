@@ -3,6 +3,7 @@ kind: ConfigMap
 metadata:
   name: postgres-configmap
 data:
-  PG_ADDR: postgres-svc:5432
-  PG_USER: pg_user
-  PG_DB: "pg_db"
+  POSTGRES_DB: ps_db
+  POSTGRES_USER: ps_user
+  POSTGRES_HOST: postgres-svc
+  POSTGRES_PORT: "5432"
