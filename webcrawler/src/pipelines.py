@@ -6,10 +6,31 @@
 
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
+import pika
+import os
 
 
 class WebcrawlerPipeline:
+	def __init__(self):
+		credentials = pika.PlainCredentials(
+			os.getenv("RMQ_USER"), os.getenv("RMQ_PASSWORD")
+		)
+
+		parameters = pika.ConnectionParameters(
+			host=os.getenv("RMQ_HOST"),
+			port=int(os.getenv("RMQ_PORT")),
+			credentials=credentials,
+		)
+
+		self.connection = pika.BlockingConnection(parameters)
+		self.channel = self.connection.channel()
+		self.channel.queue_declare(queue="scraped_items", durable=True)
+
+	def close_spider(self, spider):
+		self.connection.close()
+
 	def process_item(self, item, spider):
-		# TODO PUBLISH ITEM TO RABBITMQ
-		spider.logger.info(f"Pipeline: {item}")
+		self.channel.basic_publish(
+			exchange="", routing_key="scraped_items", body=str(item)
+		)
 		return item

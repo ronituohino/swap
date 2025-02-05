@@ -20,4 +20,9 @@ spec:
             - CLOSESPIDER_PAGECOUNT=100
             - -s
             - CLOSESPIDER_TIMEOUT=45
+          envFrom:
+            - configMapRef:
+                name: rabbitmq-configmap
+            - secretRef:
+                name: rabbitmq-secret
       restartPolicy: Never

@@ -39,11 +39,10 @@ class InfiniteSpider(CrawlSpider):
 		return text
 
 	def parse_item(self, response):
-		text = self.get_visible_text(response)
-		for category, keywords in self.categories.items():
-			if self.text_contains_keywords(text, keywords):
-				item = WebcrawlerItem(url=response.url, category=category)
-
-				self.logger.info(f"Parse item: {item}")
-
-				yield item
+		#text = self.get_visible_text(response)
+		item = WebcrawlerItem(url=response.url, category="category")
+		yield item
+		#for category, keywords in self.categories.items():
+		#	if self.text_contains_keywords(text, keywords):
+		#		item = WebcrawlerItem(url=response.url, category=category)
+		#		yield item
