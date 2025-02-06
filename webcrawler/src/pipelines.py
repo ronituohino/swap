@@ -12,25 +12,28 @@ import os
 
 class WebcrawlerPipeline:
 	def __init__(self):
-		credentials = pika.PlainCredentials(
-			os.getenv("RMQ_USER"), os.getenv("RMQ_PASSWORD")
-		)
+		# credentials = pika.PlainCredentials(
+		# os.getenv("RMQ_USER"), os.getenv("RMQ_PASSWORD")
+		# )
 
-		parameters = pika.ConnectionParameters(
-			host=os.getenv("RMQ_HOST"),
-			port=int(os.getenv("RMQ_PORT")),
-			credentials=credentials,
-		)
+		# parameters = pika.ConnectionParameters(
+		# host=os.getenv("RMQ_HOST"),
+		# port=int(os.getenv("RMQ_PORT")),
+		# credentials=credentials,
+		# )
 
-		self.connection = pika.BlockingConnection(parameters)
-		self.channel = self.connection.channel()
-		self.channel.queue_declare(queue="scraped_items", durable=True)
+		# self.connection = pika.BlockingConnection(parameters)
+		# self.channel = self.connection.channel()
+		# self.channel.queue_declare(queue="scraped_items", durable=True)
+		pass
 
 	def close_spider(self, spider):
-		self.connection.close()
+		# self.connection.close()
+		pass
 
 	def process_item(self, item, spider):
-		self.channel.basic_publish(
-			exchange="", routing_key="scraped_items", body=str(item)
-		)
+		print(f"{str(item['url'])} -- found: {item['terms']} terms")
+		# self.channel.basic_publish(
+		# exchange="", routing_key="scraped_items", body=str(item)
+		# )
 		return item

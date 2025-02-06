@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/go-pg/pg/v10"
 )
@@ -21,10 +22,10 @@ func Initialize() *pg.DB {
 	maxRetries := 10
 	for i := 0; i < maxRetries; i++ {
 		if err := db.Ping(ctx); err != nil {
-			if i == maxRetries - 1 {
+			if i == maxRetries-1 {
 				panic(err)
 			}
-			fmt.Printf("Failed to connect to database, attempt %d/%d: %v\n", i + 1, maxRetries, err)
+			fmt.Printf("Failed to connect to database, attempt %d/%d: %v\n", i+1, maxRetries, err)
 			time.Sleep(2 * time.Second)
 			continue
 		}
