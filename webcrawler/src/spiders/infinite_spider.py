@@ -23,6 +23,7 @@ class InfiniteSpider(CrawlSpider):
 
 	def __init__(self, *args, **kwargs):
 		self.start_urls = read_resource("start_sites", list)
+		self.languages = read_resource("languages", list)
 		self.selectors = read_resource("selectors", dict)
 		self.chars_to_delete = read_resource("chars_to_delete", list)
 		self.words_to_delete = read_resource("words_to_delete", list)
@@ -41,64 +42,71 @@ class InfiniteSpider(CrawlSpider):
 		# e.g a word in <body><main><h1> is counted 3 times
 		total_words = 0
 
-		for selector, semantic_relevance in self.selectors.items():
-			texts = response.css(selector).getall()
-			for text in texts:
-				# strip() removes excess whitespace on both sides
-				# lower() makes all characters lowercase
-				# split() splits text by space and newline
-				words = text.strip().lower().split()
-				word_amount = len(words)
+		title = response.css("title::text").get()
+		language = response.css("html::attr(lang)").get()
 
-				for index, word in enumerate(words):
-					# remove special characters from word
-					for ch in self.chars_to_delete:
-						if ch in word:
-							word = word.replace(ch, "")
+		# some sites do not specify language (bad you!), but index them anyways
+		if language in self.languages or language is None:
+			for selector, semantic_relevance in self.selectors.items():
+				texts = response.css(selector).getall()
+				for text in texts:
+					# strip() removes excess whitespace on both sides
+					# lower() makes all characters lowercase
+					# split() splits text by space and newline
+					words = text.strip().lower().split()
+					word_amount = len(words)
 
-					# remove english plural from end
-					if word.endswith("'s"):
-						word = word.rstrip("'s")
+					for index, word in enumerate(words):
+						# remove special characters from word
+						for ch in self.chars_to_delete:
+							if ch in word:
+								word = word.replace(ch, "")
 
-					# don't index words that are only 1 character long
-					if len(word) < 2:
-						continue
+						# remove english plural from end
+						if word.endswith("'s"):
+							word = word.rstrip("'s")
 
-					# lemmatize words to improve search (e.g. "cars" => "car")
-					if word in self.lemmatize:
-						word = self.lemmatize[word]
+						# don't index words that are only 1 character long
+						if len(word) < 2:
+							continue
 
-					# remove very generic words that don't provide insight
-					if word in self.words_to_delete:
-						continue
+						# lemmatize words to improve search (e.g. "cars" => "car")
+						if word in self.lemmatize:
+							word = self.lemmatize[word]
 
-					# apply word transforms to improve search and optimize space (e.g. "one" => "1")
-					if word in self.transforms:
-						word = self.transforms[word]
+						# remove very generic words that don't provide insight
+						if word in self.words_to_delete:
+							continue
 
-					# words that are early in text are more relevant
-					# first 10 words in any text have boosted positional_relevance
-					# then the positional_relevance approaches 1, speed depending on text length
-					offset_index = index - 10
-					if offset_index < 0:
-						offset_index = 0
-					# ranges from 2 to 1
-					positional_relevance = (1 - (offset_index / word_amount)) + 1
+						# apply word transforms to improve search and optimize space (e.g. "one" => "1")
+						if word in self.transforms:
+							word = self.transforms[word]
 
-					total_relevance = semantic_relevance * positional_relevance
+						# words that are early in text are more relevant
+						# first 10 words in any text have boosted positional_relevance
+						# then the positional_relevance approaches 1, speed depending on text length
+						offset_index = index - 10
+						if offset_index < 0:
+							offset_index = 0
+						# ranges from 2 to 1
+						positional_relevance = (1 - (offset_index / word_amount)) + 1
 
-					if word in keywords:
-						counts[word] += 1
-						relevances[word] += total_relevance
-					else:
-						keywords.add(word)
-						counts[word] = 1
-						relevances[word] = total_relevance
+						total_relevance = semantic_relevance * positional_relevance
 
-					total_words += 1
+						if word in keywords:
+							counts[word] += 1
+							relevances[word] += total_relevance
+						else:
+							keywords.add(word)
+							counts[word] = 1
+							relevances[word] = total_relevance
+
+						total_words += 1
 
 		item = WebcrawlerItem(
 			url=response.url,
+			title=title,
+			language=language,
 			keywords=list(keywords),
 			counts=counts,
 			relevances=relevances,

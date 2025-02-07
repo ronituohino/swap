@@ -1,22 +1,24 @@
 CREATE DATABASE search_index;
 
 CREATE TABLE websites (
-  id SERIAL PRIMARY KEY, -- SERIAL = 4 bytes, 1 to 2,147,483,647 range, plenty for this project
+  id SERIAL PRIMARY KEY, -- SERIAL = 4 bytes int, 1 to 2,147,483,647 range, plenty for this project
   url TEXT NOT NULL, -- max length is 2048 chars, use text because simple
-  title TEXT NOT NULL, -- max length is 512 chars
-  description TEXT NOT NULL
+  title TEXT NOT NULL -- max length is 512 chars
 );
 
 CREATE TABLE keywords (
   id SERIAL PRIMARY KEY,
-  word TEXT UNIQUE NOT NULL
+  word TEXT UNIQUE NOT NULL,
+  occurrences INT NOT NULL -- on how many pages does this word appear (calculated in indexer)
 );
 
 CREATE TABLE relations (
   id SERIAL PRIMARY KEY,
   website_id INT NOT NULL REFERENCES websites(id),
   keyword_id INT NOT NULL REFERENCES keywords(id),
-  relevance INT NOT NULL -- our own metric
+  relevance REAL NOT NULL, -- REAL = 4 bytes float, word relevance within page
+  tf REAL NOT NULL, -- float between 0 and 1, term frequency within page (calculated in crawler)
+  tfidf REAL NO NULL -- float between 0 and +inf, inverse document frequency (calculated in indexer)
 );
 
 -- TODO: CREATE INDEX ...

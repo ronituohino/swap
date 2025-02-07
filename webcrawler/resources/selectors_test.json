@@ -1,4 +1,3 @@
 {
-  "meta[name='Keywords']::attr(content)": 5,
-  "meta[name='keywords']::attr(content)": 5
+  "body::text": 5
 }

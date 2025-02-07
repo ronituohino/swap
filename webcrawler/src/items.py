@@ -8,6 +8,8 @@ from scrapy.item import Item, Field
 
 class WebcrawlerItem(Item):
 	url = Field()
+	title = Field()
+	language = Field()
 	keywords = Field()
 	counts = Field()
 	relevances = Field()

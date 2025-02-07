@@ -6,6 +6,7 @@
 
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
+from scrapy.exceptions import DropItem
 import pika
 import os
 
@@ -32,9 +33,12 @@ class WebcrawlerPipeline:
 		pass
 
 	def process_item(self, item, spider):
-		message = {}
+		if len(item["keywords"]) == 0:
+			raise DropItem("No keywords found, maybe language is not compatible")
 
+		message = {}
 		message["url"] = item["url"]
+		message["title"] = item["title"]
 		message["keywords"] = {}
 
 		for word in item["keywords"]:

@@ -1,12 +1,5 @@
 {
-  "body::text": 1,
-  "main::text": 3,
   "title::text": 30,
-  "h1::text": 5,
-  "h2::text": 4,
-  "h3::text": 3,
-  "img::attr(alt)": 5,
-  "svg > title::text": 5,
   "meta[name='Keywords']::attr(content)": 10,
   "meta[name='keywords']::attr(content)": 10,
   "meta[name='Description']::attr(content)": 10,
@@ -14,5 +7,13 @@
   "meta[property='og:title']::attr(content)": 10,
   "meta[property='og:description']::attr(content)": 10,
   "meta[property='og:site_name']::attr(content)": 10,
-  "meta[name='author']::attr(content)": 20
+  "meta[name='author']::attr(content)": 20,
+  "h1::text": 5,
+  "h2::text": 4,
+  "h3::text": 3,
+  "p::text": 1,
+  "span::text": 1,
+  "a::text": 1,
+  "img::attr(alt)": 5,
+  "svg > title::text": 5
 }
