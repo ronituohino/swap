@@ -11,4 +11,4 @@ class WebcrawlerItem(Item):
 	keywords = Field()
 	counts = Field()
 	relevances = Field()
-	terms = Field()
+	total_words = Field()

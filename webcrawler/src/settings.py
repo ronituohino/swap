@@ -105,3 +105,6 @@ ITEM_PIPELINES = {"src.pipelines.WebcrawlerPipeline": 300}
 # Set settings whose default value is deprecated to a future-proof value
 TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
 FEED_EXPORT_ENCODING = "utf-8"
+
+# For testing, start closing the spider once 1 item processed
+# CLOSESPIDER_ITEMCOUNT = 1

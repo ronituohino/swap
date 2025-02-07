@@ -32,7 +32,33 @@ class WebcrawlerPipeline:
 		pass
 
 	def process_item(self, item, spider):
-		print(f"{str(item['url'])} -- found: {item['terms']} terms")
+		message = {}
+
+		message["url"] = item["url"]
+		message["keywords"] = {}
+
+		for word in item["keywords"]:
+			word_properties = {}
+
+			# float, ranges from 0 to 1
+			term_frequency = item["counts"][word] / item["total_words"]
+			word_properties["term_frequency"] = term_frequency
+
+			# float, ranges from 1 to +inf
+			relevance = item["relevances"][word]
+			word_properties["relevance"] = relevance
+
+			message["keywords"][word] = word_properties
+
+		# print condensed crawl results
+		sorted_dict = {}
+		for key in sorted(item["relevances"], key=item["relevances"].get, reverse=True):
+			sorted_dict[key] = item["relevances"][key]
+		most_relevant = list(sorted_dict.keys())[0:5]
+
+		print(
+			f"{str(item['url'])} - {item['total_words']} terms, most relevant: {most_relevant}"
+		)
 		# self.channel.basic_publish(
 		# exchange="", routing_key="scraped_items", body=str(item)
 		# )
