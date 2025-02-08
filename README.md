@@ -7,7 +7,7 @@ A simple search engine for the internet. Built for scalability using Kubernetes.
 [Roni Tuohino](https://github.com/ronituohino)  
 [Perttu Kangas](https://github.com/DeeCaaD)
 
-## Documentation
+## Documentation and Course Report
 
 - [Architecture](./docs/architecture.md)
 
