@@ -86,9 +86,7 @@ func main() {
 
 	go func() {
 		for d := range msgs {
-			log.Printf("Received a message: %s", d.Body)
-			time.Sleep(1 * time.Second)
-			log.Printf("Done")
+			log.Printf("Processed a message: %s", d.Body)
 			d.Ack(false)
 		}
 	}()

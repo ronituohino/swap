@@ -13,24 +13,22 @@ import os
 
 class WebcrawlerPipeline:
 	def __init__(self):
-		# credentials = pika.PlainCredentials(
-		# os.getenv("RMQ_USER"), os.getenv("RMQ_PASSWORD")
-		# )
+		credentials = pika.PlainCredentials(
+		  os.getenv("RMQ_USER"), os.getenv("RMQ_PASSWORD")
+		)
 
-		# parameters = pika.ConnectionParameters(
-		# host=os.getenv("RMQ_HOST"),
-		# port=int(os.getenv("RMQ_PORT")),
-		# credentials=credentials,
-		# )
+		parameters = pika.ConnectionParameters(
+		  host=os.getenv("RMQ_HOST"),
+		  port=int(os.getenv("RMQ_PORT")),
+		  credentials=credentials,
+		)
 
-		# self.connection = pika.BlockingConnection(parameters)
-		# self.channel = self.connection.channel()
-		# self.channel.queue_declare(queue="scraped_items", durable=True)
-		pass
+		self.connection = pika.BlockingConnection(parameters)
+		self.channel = self.connection.channel()
+		self.channel.queue_declare(queue="scraped_items", durable=True)
 
 	def close_spider(self, spider):
-		# self.connection.close()
-		pass
+		self.connection.close()
 
 	def process_item(self, item, spider):
 		if len(item["keywords"]) == 0:
@@ -63,7 +61,7 @@ class WebcrawlerPipeline:
 		print(
 			f"{str(item['url'])} - {item['total_words']} terms, most relevant: {most_relevant}"
 		)
-		# self.channel.basic_publish(
-		# exchange="", routing_key="scraped_items", body=str(item)
-		# )
+		self.channel.basic_publish(
+			exchange="", routing_key="scraped_items", body=str(item)
+		)
 		return item
