@@ -9,18 +9,19 @@ from itemadapter import ItemAdapter
 from scrapy.exceptions import DropItem
 import pika
 import os
+import json
 
 
 class WebcrawlerPipeline:
 	def __init__(self):
 		credentials = pika.PlainCredentials(
-		  os.getenv("RMQ_USER"), os.getenv("RMQ_PASSWORD")
+			os.getenv("RMQ_USER"), os.getenv("RMQ_PASSWORD")
 		)
 
 		parameters = pika.ConnectionParameters(
-		  host=os.getenv("RMQ_HOST"),
-		  port=int(os.getenv("RMQ_PORT")),
-		  credentials=credentials,
+			host=os.getenv("RMQ_HOST"),
+			port=int(os.getenv("RMQ_PORT")),
+			credentials=credentials,
 		)
 
 		self.connection = pika.BlockingConnection(parameters)
@@ -52,16 +53,9 @@ class WebcrawlerPipeline:
 
 			message["keywords"][word] = word_properties
 
-		# print condensed crawl results
-		sorted_dict = {}
-		for key in sorted(item["relevances"], key=item["relevances"].get, reverse=True):
-			sorted_dict[key] = item["relevances"][key]
-		most_relevant = list(sorted_dict.keys())[0:5]
-
-		print(
-			f"{str(item['url'])} - {item['total_words']} terms, most relevant: {most_relevant}"
-		)
 		self.channel.basic_publish(
-			exchange="", routing_key="scraped_items", body=str(item)
+			exchange="",
+			routing_key="scraped_items",
+			body=json.dumps(message)
 		)
 		return item

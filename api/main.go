@@ -25,7 +25,18 @@ func main() {
 	})
 
 	r.GET("/search", func(c *gin.Context) {
-		results := db.Search(database)
+		query := c.Query("q")
+		if query == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "query parameter 'q' is required"})
+			return
+		}
+
+		results, err := db.Search(database, query)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
 		c.JSON(http.StatusOK, results)
 	})
 

@@ -4,10 +4,24 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/go-pg/pg/v10"
 )
+
+type SearchResult struct {
+	URL      string   `json:"url"`
+	Title    string   `json:"title"`
+	Score    float32  `json:"score"`
+	Keywords []string `json:"keywords"`
+}
+
+type SearchResponse struct {
+	Results   []SearchResult `json:"results"`
+	QueryTime string         `json:"query_time"`
+	TotalHits int            `json:"total_hits"`
+}
 
 func Initialize() *pg.DB {
 	fmt.Println("Connecting to Postgres database")
@@ -36,17 +50,70 @@ func Initialize() *pg.DB {
 	return db
 }
 
-type SearchResult struct {
-	id string `pg:"type:uuid,pk,unique"`
-}
+func Search(db *pg.DB, query string) (*SearchResponse, error) {
+	start := time.Now()
 
-func Search(db *pg.DB) []SearchResult {
-	var results []SearchResult
-	err := db.Model(&results).Select()
+	keywords := strings.Fields(strings.ToLower(query))
 
-	if err != nil {
-		fmt.Println("Error searching for results: ", err)
+	var results []struct {
+		WebsiteID int     `pg:"website_id"`
+		URL       string  `pg:"url"`
+		Title     string  `pg:"title"`
+		Score     float32 `pg:"score"`
 	}
 
-	return results
+	_, err := db.Query(&results, `
+			WITH matching_keywords AS (
+					SELECT DISTINCT website_id, 
+								 sum(tf * relevance) as score
+					FROM relations r
+					JOIN keywords k ON r.keyword_id = k.id
+					WHERE k.word = ANY(?::text[])
+					GROUP BY website_id
+			)
+			SELECT w.id as website_id, 
+						 w.url, 
+						 w.title, 
+						 mk.score
+			FROM matching_keywords mk
+			JOIN websites w ON w.id = mk.website_id
+			ORDER BY mk.score DESC
+			LIMIT 20
+	`, pg.Array(keywords))
+
+	if err != nil {
+		return nil, fmt.Errorf("search query failed: %v", err)
+	}
+
+	searchResults := make([]SearchResult, 0, len(results))
+	for _, r := range results {
+		var websiteKeywords []string
+		_, err := db.Query(&websiteKeywords, `
+					SELECT k.word
+					FROM relations r
+					JOIN keywords k ON r.keyword_id = k.id
+					WHERE r.website_id = ?
+					ORDER BY (r.tf * r.relevance) DESC
+					LIMIT 5
+			`, r.WebsiteID)
+
+		if err != nil {
+			return nil, fmt.Errorf("failed to fetch keywords: %v", err)
+		}
+
+		searchResults = append(searchResults, SearchResult{
+			URL:      r.URL,
+			Title:    r.Title,
+			Score:    r.Score,
+			Keywords: websiteKeywords,
+		})
+	}
+
+	queryTime := time.Since(start)
+
+	return &SearchResponse{
+		Results:   searchResults,
+		QueryTime: fmt.Sprintf("%.6fs", queryTime.Seconds()),
+		TotalHits: len(results),
+	}, nil
 }

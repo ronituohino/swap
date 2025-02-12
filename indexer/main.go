@@ -1,22 +1,17 @@
 package main
 
 import (
-	"log"
-	"time"
-	"os"
+	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
+
+	"indexer/internal/db"
+	"indexer/internal/rmq"
 
 	"github.com/gin-gonic/gin"
-
-	amqp "github.com/rabbitmq/amqp091-go"
 )
-
-func failOnError(err error, msg string) {
-	if err != nil {
-		log.Panicf("%s: %s", msg, err)
-	}
-}
 
 func main() {
 	port := os.Getenv("PORT")
@@ -24,52 +19,11 @@ func main() {
 		port = "3000"
 	}
 
-	rmqHost := os.Getenv("RMQ_HOST")
-	rmqPort := os.Getenv("RMQ_PORT")
-	rmqUser := os.Getenv("RMQ_USER")
-	rmqPassword := os.Getenv("RMQ_PASSWORD")
-	maxRetries := 10
+	database := db.Initialize()
+	defer database.Close()
 
-	var conn *amqp.Connection
-	var err error
-
-	for i := 0; i < maxRetries; i++ {
-		conn, err = amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%s/", rmqUser, rmqPassword, rmqHost, rmqPort))
-		if err == nil {
-			break
-		}
-		log.Printf("Failed to connect to RabbitMQ, attempt %d/%d: %v\n", i + 1, maxRetries, err)
-		if i < maxRetries - 1 {
-			time.Sleep(2 * time.Second)
-		}
-	}
-	failOnError(err, "Failed to connect to RabbitMQ after multiple attempts")
-	defer conn.Close()
-
-	ch, err := conn.Channel()
-	failOnError(err, "Failed to open a channel")
-	defer ch.Close()
-
-	q, err := ch.QueueDeclare(
-		"scraped_items", // name
-		true,   // durable
-		false,  // delete when unused
-		false,  // exclusive
-		false,  // no-wait
-		nil,    // arguments
-	)
-	failOnError(err, "Failed to declare a queue")
-
-	msgs, err := ch.Consume(
-		q.Name, // queue
-		"",     // consumer
-		false,  // auto-ack
-		false,  // exclusive
-		false,  // no-local
-		false,  // no-wait
-		nil,    // args
-	)
-	failOnError(err, "Failed to register a consumer")
+	rmqClient := rmq.Initialize()
+	defer rmqClient.Close()
 
 	r := gin.Default()
 	r.GET("/healthz", func(c *gin.Context) {
@@ -82,11 +36,24 @@ func main() {
 		}
 	}()
 
-	var forever chan struct{}
+	forever := make(chan struct{})
 
 	go func() {
-		for d := range msgs {
-			log.Printf("Processed a message: %s", d.Body)
+		for d := range rmqClient.Messages {
+			var message db.ScrapedMessage
+			if err := json.Unmarshal([]byte(d.Body), &message); err != nil {
+				log.Printf("Error parsing message: %v, message: %+v", err, message)
+				d.Nack(false, false) // Don't requeue due to invalid format
+				continue
+			}
+
+			if err := db.InsertScrapedData(database, message); err != nil {
+				log.Printf("Error inserting data: %v, message: %+v", err, message)
+				d.Nack(false, true)
+				continue
+			}
+
+			log.Printf("Successfully processed message for URL: %s", message.URL)
 			d.Ack(false)
 		}
 	}()
