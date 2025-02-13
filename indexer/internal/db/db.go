@@ -12,7 +12,7 @@ import (
 
 type Website struct {
 	ID    int    `pg:",pk"`
-	URL   string `pg:",notnull"`
+	URL   string `pg:",notnull,unique"`
 	Title string
 }
 
@@ -23,14 +23,13 @@ type Keyword struct {
 
 type Relation struct {
 	ID        int      `pg:",pk"`
-	WebsiteID int      `pg:",notnull,fk:website_id"`
-	KeywordID int      `pg:",notnull,fk:keyword_id"`
+	WebsiteID int      `pg:",notnull,fk:website_id,unique:website_id_keyword_id"`
+	KeywordID int      `pg:",notnull,fk:keyword_id,unique:website_id_keyword_id"`
 	Relevance float32  `pg:",notnull"`
 	TF        float32  `pg:",notnull"`
 	TFIDF     float32  `pg:",notnull"`
 	Website   *Website `pg:"fk:website_id,rel:has-one"`
 	Keyword   *Keyword `pg:"fk:keyword_id,rel:has-one"`
-	tableName struct{} `pg:"relations,alias:relation,unique:website_keyword_idx"`
 }
 
 type KeywordProperties struct {
@@ -101,7 +100,7 @@ func InsertScrapedData(db *pg.DB, messages []ScrapedMessage) error {
 	if err != nil {
 		return fmt.Errorf("error starting website transaction: %v", err)
 	}
-	_, err = tx1.Model(&websites).OnConflict("DO NOTHING").Returning("id").Insert()
+	_, err = tx1.Model(&websites).OnConflict("(url) DO UPDATE").Set("title = EXCLUDED.title").Returning("id").Insert()
 	if err != nil {
 		tx1.Rollback()
 		return fmt.Errorf("error inserting websites: %v", err)
@@ -166,7 +165,11 @@ func InsertScrapedData(db *pg.DB, messages []ScrapedMessage) error {
 		}
 	}
 
-	_, err = tx3.Model(&relations).OnConflict("DO NOTHING").Insert()
+	_, err = tx3.Model(&relations).OnConflict("(website_id, keyword_id) DO UPDATE").
+		Set("relevance = EXCLUDED.relevance").
+		Set("tf = EXCLUDED.tf").
+		Set("tfidf = EXCLUDED.tfidf").
+		Insert()
 	if err != nil {
 		tx3.Rollback()
 		return fmt.Errorf("error inserting relations: %v", err)
