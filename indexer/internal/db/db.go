@@ -30,6 +30,7 @@ type Relation struct {
 	TFIDF     float32  `pg:",notnull"`
 	Website   *Website `pg:"fk:website_id,rel:has-one"`
 	Keyword   *Keyword `pg:"fk:keyword_id,rel:has-one"`
+	tableName struct{} `pg:"relations,alias:relation,unique:website_keyword_idx"`
 }
 
 type KeywordProperties struct {
@@ -87,12 +88,6 @@ func Initialize() *pg.DB {
 }
 
 func InsertScrapedData(db *pg.DB, messages []ScrapedMessage) error {
-	tx, err := db.Begin()
-	if err != nil {
-		return fmt.Errorf("error starting transaction: %v", err)
-	}
-	defer tx.Rollback()
-
 	websites := []*Website{}
 	for _, m := range messages {
 		website := &Website{
@@ -101,45 +96,93 @@ func InsertScrapedData(db *pg.DB, messages []ScrapedMessage) error {
 		}
 		websites = append(websites, website)
 	}
-	_, err = tx.Model(&websites).OnConflict("DO NOTHING").Returning("id").Insert()
+
+	tx1, err := db.Begin()
 	if err != nil {
+		return fmt.Errorf("error starting website transaction: %v", err)
+	}
+	_, err = tx1.Model(&websites).OnConflict("DO NOTHING").Returning("id").Insert()
+	if err != nil {
+		tx1.Rollback()
 		return fmt.Errorf("error inserting websites: %v", err)
+	}
+	if err = tx1.Commit(); err != nil {
+		return fmt.Errorf("error committing website transaction: %v", err)
 	}
 
 	keywords := []*Keyword{}
+	keywordMap := make(map[string]*Keyword)
 	for _, m := range messages {
 		for word := range m.Keywords {
 			keyword := &Keyword{Word: word}
 			keywords = append(keywords, keyword)
+			keywordMap[word] = keyword
 		}
 	}
-	_, err = tx.Model(&keywords).OnConflict("DO NOTHING").Returning("id").Insert()
+
+	tx2, err := db.Begin()
 	if err != nil {
+		return fmt.Errorf("error starting keyword transaction: %v", err)
+	}
+	_, err = tx2.Model(&keywords).OnConflict("DO NOTHING").Returning("id").Insert()
+	if err != nil {
+		tx2.Rollback()
 		return fmt.Errorf("error inserting keywords: %v", err)
 	}
-
-	/*
-		for _, m := range messages {
-			for word, props := range m.Keywords {
-				relation := &Relation{
-					WebsiteID: website.ID,
-					KeywordID: keyword.ID,
-					Relevance: props.Relevance,
-					TF:        props.TermFrequency,
-					TFIDF:     0.01,
-				}
-				_, err = tx.Model(relation).Insert()
-				if err != nil {
-					return fmt.Errorf("error inserting relation: %v", err)
-				}
-			}
-		}
-	*/
-
-	err = tx.Commit()
-	if err != nil {
-		return fmt.Errorf("error committing transaction: %v", err)
+	if err = tx2.Commit(); err != nil {
+		return fmt.Errorf("error committing keyword transaction: %v", err)
 	}
 
+	relations := []*Relation{}
+	tx3, err := db.Begin()
+	if err != nil {
+		return fmt.Errorf("error starting relations transaction: %v", err)
+	}
+
+	for _, website := range websites {
+		msg := findMessageByURL(messages, website.URL)
+		if msg == nil {
+			continue
+		}
+
+		for word, props := range msg.Keywords {
+			keyword := keywordMap[word]
+			if keyword.ID == 0 {
+				err = tx3.Model(keyword).Where("word = ?", word).Select()
+				if err != nil {
+					tx3.Rollback()
+					return fmt.Errorf("error fetching keyword ID: %v", err)
+				}
+			}
+
+			relation := &Relation{
+				WebsiteID: website.ID,
+				KeywordID: keyword.ID,
+				Relevance: props.Relevance,
+				TF:        props.TermFrequency,
+				TFIDF:     0.01,
+			}
+			relations = append(relations, relation)
+		}
+	}
+
+	_, err = tx3.Model(&relations).OnConflict("DO NOTHING").Insert()
+	if err != nil {
+		tx3.Rollback()
+		return fmt.Errorf("error inserting relations: %v", err)
+	}
+	if err = tx3.Commit(); err != nil {
+		return fmt.Errorf("error committing relations transaction: %v", err)
+	}
+
+	return nil
+}
+
+func findMessageByURL(messages []ScrapedMessage, url string) *ScrapedMessage {
+	for i := range messages {
+		if messages[i].URL == url {
+			return &messages[i]
+		}
+	}
 	return nil
 }

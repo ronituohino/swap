@@ -65,7 +65,7 @@ func main() {
 				}
 				message_buffer = append(message_buffer, scraped)
 				if len(message_buffer) < message_buffer_max {
-					flushTimeout.Reset(5 * time.Second)
+					flushTimeout.Reset(30 * time.Second)
 					continue
 				}
 
@@ -89,7 +89,7 @@ func main() {
 					}
 					message_buffer = nil
 				}
-				flushTimeout.Reset(5 * time.Second)
+				flushTimeout.Reset(30 * time.Second)
 			}
 		}
 	}()
