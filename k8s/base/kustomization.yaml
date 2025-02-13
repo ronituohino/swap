@@ -16,6 +16,7 @@ resources:
   - manifests/api/deployment.yaml
   - manifests/api/service.yaml
 
+  - manifests/indexer/configmap.yaml
   - manifests/indexer/deployment.yaml
   - manifests/indexer/service.yaml
 

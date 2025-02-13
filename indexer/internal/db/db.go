@@ -86,43 +86,55 @@ func Initialize() *pg.DB {
 	return db
 }
 
-func InsertScrapedData(db *pg.DB, message ScrapedMessage) error {
+func InsertScrapedData(db *pg.DB, messages []ScrapedMessage) error {
 	tx, err := db.Begin()
 	if err != nil {
 		return fmt.Errorf("error starting transaction: %v", err)
 	}
 	defer tx.Rollback()
 
-	website := &Website{
-		URL:   message.URL,
-		Title: message.Title,
+	websites := []*Website{}
+	for _, m := range messages {
+		website := &Website{
+			URL:   m.URL,
+			Title: m.Title,
+		}
+		websites = append(websites, website)
 	}
-	_, err = tx.Model(website).Insert()
+	_, err = tx.Model(&websites).OnConflict("DO NOTHING").Returning("id").Insert()
 	if err != nil {
-		return fmt.Errorf("error inserting website: %v", err)
+		return fmt.Errorf("error inserting websites: %v", err)
 	}
 
-	for word, props := range message.Keywords {
-		keyword := &Keyword{Word: word}
-		_, err = tx.Model(keyword).
-			Where("word = ?", word).
-			SelectOrInsert()
-		if err != nil {
-			return fmt.Errorf("error inserting keyword: %v", err)
-		}
-
-		relation := &Relation{
-			WebsiteID: website.ID,
-			KeywordID: keyword.ID,
-			Relevance: props.Relevance,
-			TF:        props.TermFrequency,
-			TFIDF:     0.01,
-		}
-		_, err = tx.Model(relation).Insert()
-		if err != nil {
-			return fmt.Errorf("error inserting relation: %v", err)
+	keywords := []*Keyword{}
+	for _, m := range messages {
+		for word := range m.Keywords {
+			keyword := &Keyword{Word: word}
+			keywords = append(keywords, keyword)
 		}
 	}
+	_, err = tx.Model(&keywords).OnConflict("DO NOTHING").Returning("id").Insert()
+	if err != nil {
+		return fmt.Errorf("error inserting keywords: %v", err)
+	}
+
+	/*
+		for _, m := range messages {
+			for word, props := range m.Keywords {
+				relation := &Relation{
+					WebsiteID: website.ID,
+					KeywordID: keyword.ID,
+					Relevance: props.Relevance,
+					TF:        props.TermFrequency,
+					TFIDF:     0.01,
+				}
+				_, err = tx.Model(relation).Insert()
+				if err != nil {
+					return fmt.Errorf("error inserting relation: %v", err)
+				}
+			}
+		}
+	*/
 
 	err = tx.Commit()
 	if err != nil {

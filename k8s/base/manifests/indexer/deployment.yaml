@@ -17,6 +17,8 @@ spec:
           image: INDEXER-IMAGE
           envFrom:
             - configMapRef:
+                name: indexer-configmap
+            - configMapRef:
                 name: postgres-configmap
             - secretRef:
                 name: postgres-secret

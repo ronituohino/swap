@@ -1,6 +1,7 @@
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
 from ..items import WebcrawlerItem
+from random import shuffle
 
 import json
 
@@ -22,7 +23,10 @@ class InfiniteSpider(CrawlSpider):
 	name = "infinite"
 
 	def __init__(self, *args, **kwargs):
-		self.start_urls = read_resource("start_sites", list)
+		start_urls = read_resource("start_sites", list)
+		shuffle(start_urls)
+		self.start_urls = start_urls
+
 		self.languages = read_resource("languages", list)
 		self.selectors = read_resource("selectors", dict)
 		self.chars_to_delete = read_resource("chars_to_delete", list)

@@ -1,10 +1,11 @@
 [
   "https://youtube.com",
   "https://reddit.com",
-  "https://yahoo.com",
   "https://amazon.com",
   "https://tiktok.com",
   "https://netflix.com",
+  "https://yahoo.com",
+  "https://www.google.com/",
   "https://bing.com",
   "https://linkedin.com",
   "https://live.com",
@@ -18,5 +19,8 @@
   "https://ebay.com",
   "https://wikipedia.org",
   "https://stackoverflow.com",
-  "https://threads.net"
+  "https://threads.net",
+  "https://medium.com/",
+  "https://www.ieee.org/",
+  "https://dl.acm.org/"
 ]

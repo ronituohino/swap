@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	"indexer/internal/db"
 	"indexer/internal/rmq"
@@ -37,24 +38,41 @@ func main() {
 	}()
 
 	forever := make(chan struct{})
+	message_buffer_max, err := strconv.Atoi(os.Getenv("MESSAGE_BUFFER_MAX"))
+	if err != nil {
+		panic(err)
+	}
+	message_buffer := []db.ScrapedMessage{}
 
 	go func() {
 		for d := range rmqClient.Messages {
-			var message db.ScrapedMessage
-			if err := json.Unmarshal([]byte(d.Body), &message); err != nil {
-				log.Printf("Error parsing message: %v, message: %+v", err, message)
+			var scraped db.ScrapedMessage
+			if err := json.Unmarshal([]byte(d.Body), &scraped); err != nil {
+				log.Printf("Error parsing message: %v, message: %+v", err, scraped)
 				d.Nack(false, false) // Don't requeue due to invalid format
 				continue
 			}
-
-			if err := db.InsertScrapedData(database, message); err != nil {
-				log.Printf("Error inserting data: %v, message: %+v", err, message)
-				d.Nack(false, true)
+			log.Printf("Added data to buffer from: %+v", scraped.URL)
+			message_buffer = append(message_buffer, scraped)
+			if len(message_buffer) < message_buffer_max {
+				// Buffer messages in local store
 				continue
 			}
 
-			log.Printf("Successfully processed message for URL: %s", message.URL)
-			d.Ack(false)
+			// Once buffer full, send buffered messaged to db
+			if err := db.InsertScrapedData(database, message_buffer); err != nil {
+				log.Printf("Error inserting data: %v", err)
+				// Negatively ack all messages in this buffer
+				// Request to send to another consumer
+				d.Nack(true, true)
+			} else {
+				log.Printf("Successfully processed message buffer!")
+				// Ack all messages in this buffer
+				d.Ack(true)
+			}
+
+			// Empty buffer
+			message_buffer = nil
 		}
 	}()
 
