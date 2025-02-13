@@ -27,7 +27,7 @@ type Relation struct {
 	KeywordID int      `pg:",notnull,fk:keyword_id,unique:website_id_keyword_id"`
 	Relevance float32  `pg:",notnull"`
 	TF        float32  `pg:",notnull"`
-	TFIDF     float32  `pg:",notnull"`
+	IDF       float32  `pg:",notnull"`
 	Website   *Website `pg:"fk:website_id,rel:has-one"`
 	Keyword   *Keyword `pg:"fk:keyword_id,rel:has-one"`
 }
@@ -87,12 +87,15 @@ func Initialize() *pg.DB {
 }
 
 func InsertScrapedData(db *pg.DB, messages []ScrapedMessage) error {
-	websites := []*Website{}
+	websiteMap := make(map[string]*Website)
 	for _, m := range messages {
-		website := &Website{
+		websiteMap[m.URL] = &Website{
 			URL:   m.URL,
 			Title: m.Title,
 		}
+	}
+	websites := make([]*Website, 0, len(websiteMap))
+	for _, website := range websiteMap {
 		websites = append(websites, website)
 	}
 
@@ -100,7 +103,10 @@ func InsertScrapedData(db *pg.DB, messages []ScrapedMessage) error {
 	if err != nil {
 		return fmt.Errorf("error starting website transaction: %v", err)
 	}
-	_, err = tx1.Model(&websites).OnConflict("(url) DO UPDATE").Set("title = EXCLUDED.title").Returning("id").Insert()
+	_, err = tx1.Model(&websites).OnConflict("(url) DO UPDATE").
+		Set("title = EXCLUDED.title").
+		Returning("id").
+		Insert()
 	if err != nil {
 		tx1.Rollback()
 		return fmt.Errorf("error inserting websites: %v", err)
@@ -109,21 +115,26 @@ func InsertScrapedData(db *pg.DB, messages []ScrapedMessage) error {
 		return fmt.Errorf("error committing website transaction: %v", err)
 	}
 
-	keywords := []*Keyword{}
 	keywordMap := make(map[string]*Keyword)
 	for _, m := range messages {
 		for word := range m.Keywords {
-			keyword := &Keyword{Word: word}
-			keywords = append(keywords, keyword)
-			keywordMap[word] = keyword
+			if _, exists := keywordMap[word]; !exists {
+				keywordMap[word] = &Keyword{Word: word}
+			}
 		}
+	}
+	keywords := make([]*Keyword, 0, len(keywordMap))
+	for _, keyword := range keywordMap {
+		keywords = append(keywords, keyword)
 	}
 
 	tx2, err := db.Begin()
 	if err != nil {
 		return fmt.Errorf("error starting keyword transaction: %v", err)
 	}
-	_, err = tx2.Model(&keywords).OnConflict("DO NOTHING").Returning("id").Insert()
+	_, err = tx2.Model(&keywords).OnConflict("DO NOTHING").
+		Returning("id").
+		Insert()
 	if err != nil {
 		tx2.Rollback()
 		return fmt.Errorf("error inserting keywords: %v", err)
@@ -132,7 +143,7 @@ func InsertScrapedData(db *pg.DB, messages []ScrapedMessage) error {
 		return fmt.Errorf("error committing keyword transaction: %v", err)
 	}
 
-	relations := []*Relation{}
+	relationMap := make(map[string]*Relation)
 	tx3, err := db.Begin()
 	if err != nil {
 		return fmt.Errorf("error starting relations transaction: %v", err)
@@ -154,21 +165,26 @@ func InsertScrapedData(db *pg.DB, messages []ScrapedMessage) error {
 				}
 			}
 
-			relation := &Relation{
+			compositeKey := fmt.Sprintf("%d-%d", website.ID, keyword.ID)
+			relationMap[compositeKey] = &Relation{
 				WebsiteID: website.ID,
 				KeywordID: keyword.ID,
 				Relevance: props.Relevance,
 				TF:        props.TermFrequency,
-				TFIDF:     0.01,
+				IDF:       0.01,
 			}
-			relations = append(relations, relation)
 		}
+	}
+
+	relations := make([]*Relation, 0, len(relationMap))
+	for _, relation := range relationMap {
+		relations = append(relations, relation)
 	}
 
 	_, err = tx3.Model(&relations).OnConflict("(website_id, keyword_id) DO UPDATE").
 		Set("relevance = EXCLUDED.relevance").
 		Set("tf = EXCLUDED.tf").
-		Set("tfidf = EXCLUDED.tfidf").
+		Set("idf = EXCLUDED.idf").
 		Insert()
 	if err != nil {
 		tx3.Rollback()

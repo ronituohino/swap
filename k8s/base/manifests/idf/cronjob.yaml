@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: idf
+  labels:
+    app: idf
+spec:
+  schedule: "*/5 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: idf
+        spec:
+          containers:
+            - name: idf
+              image: IDF-IMAGE
+              envFrom:
+                - configMapRef:
+                    name: postgres-configmap
+                - secretRef:
+                    name: postgres-secret
+          restartPolicy: OnFailure

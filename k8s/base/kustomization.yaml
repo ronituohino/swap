@@ -5,6 +5,9 @@ images:
   - name: API-IMAGE
     newName: ronituohino/swap-search
     newTag: api
+  - name: IDF-IMAGE
+    newName: ronituohino/swap-search
+    newTag: idf
   - name: INDEXER-IMAGE
     newName: ronituohino/swap-search
     newTag: indexer
@@ -15,6 +18,8 @@ images:
 resources:
   - manifests/api/deployment.yaml
   - manifests/api/service.yaml
+
+  - manifests/idf/cronjob.yaml
 
   - manifests/indexer/configmap.yaml
   - manifests/indexer/deployment.yaml

@@ -65,7 +65,7 @@ func Search(db *pg.DB, query string) (*SearchResponse, error) {
 	_, err := db.Query(&results, `
 			WITH matching_keywords AS (
 					SELECT DISTINCT website_id, 
-								 sum(tf * relevance) as score
+								 sum(tf * idf * relevance) as score
 					FROM relations r
 					JOIN keywords k ON r.keyword_id = k.id
 					WHERE k.word = ANY(?::text[])
@@ -93,7 +93,7 @@ func Search(db *pg.DB, query string) (*SearchResponse, error) {
 					FROM relations r
 					JOIN keywords k ON r.keyword_id = k.id
 					WHERE r.website_id = ?
-					ORDER BY (r.tf * r.relevance) DESC
+					ORDER BY (r.tf * r.idf * r.relevance) DESC
 					LIMIT 5
 			`, r.WebsiteID)
 
