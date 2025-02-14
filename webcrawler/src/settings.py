@@ -17,7 +17,7 @@ RETRY_ENABLED = False
 DOWNLOAD_TIMEOUT = 15
 
 # DFO -> BFO
-DEPTH_PRIORITY = 1
+DEPTH_PRIORITY = 3
 SCHEDULER_DISK_QUEUE = "scrapy.squeues.PickleFifoDiskQueue"
 SCHEDULER_MEMORY_QUEUE = "scrapy.squeues.FifoMemoryQueue"
 

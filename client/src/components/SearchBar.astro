@@ -1,0 +1,39 @@
+---
+const SEARCH_API_URL = "http://www.example.com"
+---
+
+<form onsubmit="" class="search-bar" data-api={SEARCH_API_URL}>
+	<input type="text" name="query" class="search-input" />
+	<button class="button" type="submit">
+		search
+	</button>
+</form>
+
+<script>
+  const form = document.querySelector('.search-bar') as HTMLFormElement | null;
+	if(form) {
+		form.addEventListener('submit', (e) => {
+			e.preventDefault();
+			const data = new FormData(form);
+			const query = data.get("query")?.toString()
+			if(query) {
+				window.location.href = window.location.origin + `/swap/search?q=${encodeURI(query)}`
+			}
+		});
+	}
+</script>
+
+<style>
+	.search-bar {
+		display: flex;
+	}
+	.search-input {
+		height: 4rem;
+		width: min(20rem, 100%);
+		padding: 1rem;
+	}
+	.button {
+		height: 4rem;
+		width: 4rem;
+	}
+</style>

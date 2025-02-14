@@ -50,10 +50,40 @@ func Initialize() *pg.DB {
 	return db
 }
 
-func Search(db *pg.DB, query string) (*SearchResponse, error) {
+func Search(db *pg.DB, query string, lemmatize map[string]string, transforms map[string]string) (*SearchResponse, error) {
 	start := time.Now()
 
 	keywords := strings.Fields(strings.ToLower(query))
+	processed_keywords := []string{}
+
+	for _, k := range keywords {
+		k = strings.Trim(k, "\n\t ")
+		k = strings.TrimRight(k, "'s")
+
+		// Returns characters (runes) between a-z and 0-9
+		clean := func(r rune) rune {
+			switch {
+			case r >= 'a' && r <= 'z':
+				return r
+			case r >= '0' && r <= '9':
+				return r
+			}
+			return -1
+		}
+		k = strings.Map(clean, k)
+
+		lem, ok := lemmatize[k]
+		if ok {
+			k = lem
+		}
+
+		tra, ok := transforms[k]
+		if ok {
+			k = tra
+		}
+
+		processed_keywords = append(processed_keywords, k)
+	}
 
 	var results []struct {
 		WebsiteID int     `pg:"website_id"`
@@ -79,7 +109,7 @@ func Search(db *pg.DB, query string) (*SearchResponse, error) {
 			JOIN websites w ON w.id = mk.website_id
 			ORDER BY mk.score DESC
 			LIMIT 20
-	`, pg.Array(keywords))
+	`, pg.Array(processed_keywords))
 
 	if err != nil {
 		return nil, fmt.Errorf("search query failed: %v", err)

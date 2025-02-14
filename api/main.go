@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 
@@ -19,6 +21,28 @@ func main() {
 	database := db.Initialize()
 	defer database.Close()
 
+	// Read in lemmatize.json
+	lem_content, err := os.ReadFile("./lemmatize.json")
+	if err != nil {
+		log.Fatal("Error when opening file: ", err)
+	}
+	var lemmatize map[string]string
+	err = json.Unmarshal(lem_content, &lemmatize)
+	if err != nil {
+		log.Fatal("Error during Unmarshal(): ", err)
+	}
+
+	// Read in transforms.json
+	tra_content, err := os.ReadFile("./transforms.json")
+	if err != nil {
+		log.Fatal("Error when opening file: ", err)
+	}
+	var transforms map[string]string
+	err = json.Unmarshal(tra_content, &transforms)
+	if err != nil {
+		log.Fatal("Error during Unmarshal(): ", err)
+	}
+
 	r := gin.Default()
 	r.GET("/healthz", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
@@ -31,7 +55,7 @@ func main() {
 			return
 		}
 
-		results, err := db.Search(database, query)
+		results, err := db.Search(database, query, lemmatize, transforms)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return

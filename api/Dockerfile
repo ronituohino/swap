@@ -14,6 +14,9 @@ FROM scratch AS runner
 
 WORKDIR /usr/src/app
 
+COPY --from=builder /app/lemmatize.json .
+COPY --from=builder /app/transforms.json .
+
 COPY --from=builder /app/main .
 
 ENV GIN_MODE=release

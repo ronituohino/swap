@@ -4,7 +4,7 @@ import '@fontsource-variable/nunito';
 
 const title = "SWAP Search";
 const description =
-  "SWAP Search is a search engine school project for University of Helsinki.";
+  "SWAP Search Engine is a school project for University of Helsinki.";
 ---
 
 <!doctype html>
@@ -30,7 +30,9 @@ const description =
 		<meta name="generator" content={Astro.generator} />
 	</head>
 	<body>
-		<slot />
+		<main>
+			<slot />
+		</main>
 	</body>
 </html>
 
@@ -77,11 +79,9 @@ const description =
 <style>
 	:root {
 		--bg-col: #252525;
-		--bg-line-col: #2b2b2b;
 
-		--box-col: rgb(255, 132, 75);
 		color: rgb(20, 20, 20);
-
+rgb(226, 226, 226)
 		--link-col: rgb(0, 17, 252);
 		--link-visited-col: rgb(121, 0, 219);
 		--link-hover-col: rgb(51, 65, 255);
@@ -93,8 +93,5 @@ const description =
 	}
 	body {
 		background-color: var(--bg-col);
-		background-image:  linear-gradient(var(--bg-line-col) 2px, transparent 2px), linear-gradient(90deg, var(--bg-line-col) 2px, transparent 2px), linear-gradient(var(--bg-line-col) 1px, transparent 1px), linear-gradient(90deg, var(--bg-line-col) 1px, var(--bg-col) 1px);
-		background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
-		background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
 	}
 </style>
