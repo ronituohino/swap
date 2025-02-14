@@ -1,0 +1,4 @@
+#!/bin/sh
+
+export PGPASSWORD=$POSTGRES_PASSWORD
+psql postgresql://$POSTGRES_USER:$PGPASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_DB -f /app/idf-calculator.sql

@@ -27,10 +27,17 @@ class InfiniteSpider(CrawlSpider):
 		shuffle(start_urls)
 		self.start_urls = start_urls
 
-		self.languages = read_resource("languages", list)
+		lang = read_resource("languages", list)
+		self.languages = set(lang)
+
 		self.selectors = read_resource("selectors", dict)
-		self.chars_to_delete = read_resource("chars_to_delete", list)
-		self.words_to_delete = read_resource("words_to_delete", list)
+
+		chars = read_resource("chars_to_include", list)
+		self.chars_to_include = set(chars)
+
+		words = read_resource("words_to_delete", list)
+		self.words_to_delete = set(words)
+
 		self.lemmatize = read_resource("lemmatize", dict)
 		self.transforms = read_resource("transforms", dict)
 
@@ -61,14 +68,14 @@ class InfiniteSpider(CrawlSpider):
 					word_amount = len(words)
 
 					for index, word in enumerate(words):
-						# remove special characters from word
-						for ch in self.chars_to_delete:
-							if ch in word:
-								word = word.replace(ch, "")
-
-						# remove english plural from end
+						# remove english possessive from end
 						if word.endswith("'s"):
 							word = word.rstrip("'s")
+
+						# remove special characters from word
+						for ch in word:
+							if ch not in self.chars_to_include:
+								word = word.replace(ch, "")
 
 						# don't index words that are only 1 character long
 						if len(word) < 2:
