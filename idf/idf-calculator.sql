@@ -3,7 +3,7 @@ LANGUAGE plpgsql
 AS $$
 DECLARE
   total_websites float;
-  batch_size integer := 100000;
+  batch_size integer := 1000000;
   max_id integer;
   current_id integer := 0;
   total_batches integer;
