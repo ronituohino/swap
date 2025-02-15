@@ -16,6 +16,13 @@ spec:
       containers:
         - name: postgres
           image: postgres:17.2-alpine3.20
+          args:
+            - "-c"
+            - "shared_buffers=4GB"
+            - "-c"
+            - "work_mem=128MB"
+            - "-c"
+            - "max_wal_size=2GB"
           ports:
             - containerPort: 5432
           envFrom:
