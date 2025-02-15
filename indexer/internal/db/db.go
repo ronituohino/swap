@@ -83,6 +83,14 @@ func Initialize() *pg.DB {
 		}
 	}
 
+	_, err := db.Exec(`
+        CREATE INDEX IF NOT EXISTS idx_relations_keyword_id ON relations (keyword_id);
+        CREATE INDEX IF NOT EXISTS idx_relations_website_id ON relations (website_id);
+    `)
+	if err != nil {
+		panic(fmt.Sprintf("Error creating indexes: %v", err))
+	}
+
 	return db
 }
 
