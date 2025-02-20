@@ -9,7 +9,8 @@ A simple search engine for the internet. Built for scalability using Kubernetes.
 
 ## Documentation and Course Report
 
-- [Architecture](./docs/architecture.md)
+- [Architecture and Course Report](./docs/architecture.md)
+- [Deployment](./docs/deployment.md)
 
 ## Development
 
