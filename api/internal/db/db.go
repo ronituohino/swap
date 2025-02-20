@@ -2,6 +2,8 @@ package db
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 	"os"
 	"strings"
@@ -25,11 +27,32 @@ type SearchResponse struct {
 
 func Initialize() *pg.DB {
 	fmt.Println("Connecting to Postgres database")
+
+	// Load CA cert if given
+	ca_path, ca_cert_defined := os.LookupEnv("CA_PATH")
+	var tlsConfig *tls.Config
+	if ca_cert_defined {
+		caCert, err := os.ReadFile(ca_path)
+		if err != nil {
+			panic(fmt.Sprintf("failed to read CA certificate: %v", err))
+		}
+		caCertPool := x509.NewCertPool()
+		caCertPool.AppendCertsFromPEM(caCert)
+
+		tlsConfig =
+			&tls.Config{
+				RootCAs:            caCertPool,
+				InsecureSkipVerify: false,
+				ServerName:         os.Getenv("POSTGRES_HOST"),
+			}
+	}
+
 	db := pg.Connect(&pg.Options{
-		Addr:     fmt.Sprintf("%s:%s", os.Getenv("POSTGRES_HOST"), os.Getenv("POSTGRES_PORT")),
-		User:     os.Getenv("POSTGRES_USER"),
-		Password: os.Getenv("POSTGRES_PASSWORD"),
-		Database: os.Getenv("POSTGRES_DB"),
+		Addr:      fmt.Sprintf("%s:%s", os.Getenv("POSTGRES_HOST"), os.Getenv("POSTGRES_PORT")),
+		User:      os.Getenv("POSTGRES_USER"),
+		Password:  os.Getenv("POSTGRES_PASSWORD"),
+		Database:  os.Getenv("POSTGRES_DB"),
+		TLSConfig: tlsConfig,
 	})
 
 	ctx := context.Background()
