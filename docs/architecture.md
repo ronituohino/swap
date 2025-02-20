@@ -134,6 +134,10 @@ _Architectural Effects:_
  
 -- Reduces scalability, because it's a relational database and it doesn't scale horizontally. We could use [CockroachDB](https://www.cockroachlabs.com/) or [Cassandra](https://cassandra.apache.org/_/index.html) to make it distributed. However, these are not a familiar technologies for us, and we want to get a functional service up as quickly as possible.
 
+#### IDF
+
+to do...
+
 ### Serving
 
 The second major part of our application is Serving, which refers to services that are needed to make our search index accessible to people.  
