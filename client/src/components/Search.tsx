@@ -128,7 +128,7 @@ export function Search() {
         <input
           type="text"
           name="query"
-          aria-label="Input search query"
+          placeholder="Search query..."
           class="search-input"
         />
         <button class="button" type="submit" aria-label="Search">
