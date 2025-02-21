@@ -163,8 +163,8 @@ export function Search() {
                     <a href={hit.url} target="_blank" class="result">
                       <span class="result-title">{hit.title}</span>
                       <span class="result-details">
-                        ({hit.url}) <br /> {hit.keywords.join(", ")} |{" "}
-                        {hit.score}
+                        {hit.url} <br />
+                        <br /> {hit.keywords.join(", ")} | {hit.score}
                       </span>
                     </a>
                   </li>

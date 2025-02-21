@@ -65,8 +65,11 @@ main {
 
 .result-title {
   display: block;
+  overflow-wrap: break-word;
 }
 .result-details {
+  display: block;
+  overflow-wrap: break-word;
   font-size: 0.75rem;
   color: var(--gray);
 }
