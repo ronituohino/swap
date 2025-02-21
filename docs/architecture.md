@@ -136,7 +136,7 @@ _Architectural Effects:_
 
 #### IDF
 
-We use [TF-IDF](https://en.wikipedia.org/wiki/Tf%E2%80%93idf) along relevance of words when scoring the search results. Term frequency (TF) is calculated by the crawler, but IDF is calculated as separate cron job due to it requiring more computing power. Prefarrably IDF calculations would run at night.
+We use [TF-IDF](https://en.wikipedia.org/wiki/Tf%E2%80%93idf) along relevance of words when scoring the search results. Term frequency (TF) is calculated by the crawler, but Inverse document frequency (IDF) is calculated as separate cron job due to it requiring more computing power. Prefarrably IDF calculations would run at night.
 
 The calculations are done in batch sizes of `1 000 000` to reduce the size of one commit.
 
@@ -196,8 +196,44 @@ The Client is implemented using the [Astro](https://astro.build/) framework, and
 
 It is available at https://ronituohino.github.io/swap/.
 
-## Observations, Conclusions, and Lessons Learned
+## Observations, Lessons learned and Conclusions
 
-TODO: in final report
+### Infrastructure
 
-TOOD: add more recommendations to architectural effects
+Setting up the infrastructure for this kind of project requires some work, but preplanning properly what services handle certain tasks helps a lot. Because of the preplanning we were able to divide tasks, and develop them individually using tools of our choice. The infrastructure we chose ended up being quite performant, and the main bottleneck currently is the non-distributed database.
+
+### Tools
+
+Searching up tools can speed up the development. As an example first we were going to do our own web crawler implementation which was quite slow in it's simplest implementation. We ended up using library for it. If there is ready and maintained tool for some task, it should at least be considered instead of always creating own implementation.
+
+Using tools like Copilot can speed up the development if used correctly. One must understand the changes it suggests before pressing accept. They can also help developer by pushing them to the right direction of solving problem. Although its not recommended to use such tools if in early stages of learning to code.
+
+### Data management
+
+Data management ended up being one of the hardest parts of this project. We created our index by scraping internet for `~4hr` using only **one** webcrawler and indexer which resulted to the following:
+
+| Table name | Total count | Total size | Table size | Index size |
+| ---------- | ----------- | ---------- | ---------- | ---------- |
+| websites   | ~140k       | 44 MB      | 26 MB      | 19 MB      |
+| keywords   | ~190k       | 13 MB      | 9.5 MB     | 4.2 MB     |
+| relations  | ~17.3m      | 2015 MB    | 1125 MB    | 890 MB     |
+
+Surprisingly, a lot of data fits into the index while maintaining reasonable disk usage.
+
+Our next problem was that queries took a lot of time. Following numbers are when using free-tier hosting provider with only one CPU available. When searching `Los Angeles` the search took `~8.83s`. We ended up adding database indexes for relations table which resulted to same query taking `~2.83s`, and increasing relations index size by `236MB`.
+
+| Table name | Total count | Total size | Table size | Index size |
+| ---------- | ----------- | ---------- | ---------- | ---------- |
+| websites   | ~140k       | 44 MB      | 26 MB      | 19 MB      |
+| keywords   | ~190k       | 13 MB      | 9.5 MB     | 4.2 MB     |
+| relations  | ~17.3m      | 2251 MB    | 1125 MB    | 1126 MB    |
+
+Then the next problem we faced were IDF calculations. The first version we had would've taken unreasonable amount of time (days) for above table sizes. To improve this we removed batching to prosess all in one, and also increased the `shared_buffers`, `work_mem` and `max_wal_size` in PostgreSQL drastically. This resulted in 8 core CPU to process IDF update for all `~17.3m` relations in `~18min`. We tried to readd batches with size of `100 000` which resulted to `~55min` processing time. Ended our experiments there, transaction management and query optimization course is starting in next period... Batch processing would offer benefits such as smaller transactions, system remains responsive, and less locks.
+
+### Buffers
+
+Processing data in bulks is usually better if there is a lot of data moving around.
+
+In the first version of indexer when it received message from RabbitMQ it instantly inserted the message into database. When we started 3 indexers, 3 webcrawlers, and 3 RabbitMQ instances in parallel we got Postgres constantly throwing errors about deadlocks.
+
+To reduce this we added message buffer and flush timer. Now it processes `100` messages or waits for `30s` before inserting them to database in bulk. The messages are acknowledged to RabbitMQ by indexer after all of them are inserted into database. Therefore either all of them succeed or all fail.
