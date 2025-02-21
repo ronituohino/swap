@@ -10,9 +10,6 @@ ports:
   - port: 8081:80
     nodeFilters:
       - loadbalancer
-  - port: 8082:8082
-    nodeFilters:
-      - loadbalancer
 options:
   k3s:
     extraArgs:

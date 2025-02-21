@@ -14,15 +14,15 @@ In the end, we will also list observations, conclusions, and lessons learned fro
 ## Experimentation Setup
 
 All of our backend services are in a Kubernetes cluster. The definitions for these services are in [../k8s](../k8s/).  
-This makes it easy for us to deploy and manage the application and complexity.  
+This makes it easy for us to deploy and manage the application and complexity.
 
 _Architectural Effects:_
 
 ++ Increases scalability, because Kubernetes can be configured to automatically scale services up/down according to demand.  
 ++ Increases maintainability, because Kubernetes offers lots of tooling to manage services. This is particularily good, because some of the standard tooling is very common in the industry.  
--- Increases complexity, because Kubernetes is not an easy system to understand fully. 
+-- Increases complexity, because Kubernetes is not an easy system to understand fully.
 
-The search engine can be divided into two major parts: Indexing, and Serving, which roughly translate to the backend and frontend of the application.  
+The search engine can be divided into two major parts: Indexing, and Serving, which roughly translate to the backend and frontend of the application.
 
 ![architecture](./architecture.png)
 
@@ -35,7 +35,7 @@ Indexing contains a few parts: Crawler, RabbitMQ, Indexer, and Database.
 
 The crawler is an application (or "bot") that scans web pages for relevant terms within the page. For example, the relevant terms for a page about making mocha cake would probably be "mocha", "cake", "cooking", "baking". The crawler uses many heuristics to form these kinds of lists from web pages. After scanning a page for relevant terms, the crawler looks up links to other pages, which it then continues to scan.
 
-The crawler is implemented in [../webcrawler](../webcrawler/), and it uses the [scrapy](https://scrapy.org/) framework.  
+The crawler is implemented in [../webcrawler](../webcrawler/), and it uses the [scrapy](https://scrapy.org/) framework.
 
 _Workflow:_
 
@@ -56,16 +56,16 @@ _Workflow:_
 
 The format of the message is as follows:
 
-```
-{ 
+```json
+{
   "url": "example.com",
   "title": "Example Domain",
   "keywords": {
-    "domain": {
+    "word1": {
       "relevance": 70,
       "term_frequency": 0.5
     },
-    "example": {
+    "word2": {
       "relevance": 60,
       "term_frequency": 0.45
     },
@@ -76,7 +76,7 @@ The format of the message is as follows:
 
 #### RabbitMQ
 
-We use [RabbitMQ](https://www.rabbitmq.com/) as a message broker between the Crawlers, and Indexers. This allows us to detach the crawlers and indexers from each other architectually. 
+We use [RabbitMQ](https://www.rabbitmq.com/) as a message broker between the Crawlers, and Indexers. This allows us to detach the crawlers and indexers from each other architectually.
 
 _Architectural Effects:_
 
@@ -88,16 +88,16 @@ _Architectural Effects:_
 
 #### Indexer
 
-The indexer is an application that takes crawl results from Crawlers, and processes them to suitable format (reverse-index) for the database. In addition, some search-relevance processing could be done at this stage as well, but we are not sure yet.
+The indexer is an application that takes crawl results from Crawlers, and processes them to suitable format (reverse-index) for the database.
 
-The indexer is implemented in [../indexer](../indexer/).   
+The indexer is implemented in [../indexer](../indexer/).
 
 For example, the reverse-index for the `example.com` message would look like this:
 
-```
-{ 
-  "domain": ["example.com"], 
-  "example": ["example.com"] 
+```json
+{
+  "word1": ["example.com"],
+  "word2": ["example.com"]
 }
 ```
 
@@ -106,10 +106,10 @@ _Workflow:_
 - The indexer connects and authenticates to Postgres
 - The indexer connects and authenticates to RabbitMQ
 - Whenever a message is received from RabbitMQ
-  - Add data to local reverse-index
-  - Start a timer if not active already (e.g. 60s)
-  - If new messages arrive, add them to the local index
-  - When the timer expries, flush the local index to the database
+  - Wait 30s or until message buffer size (e.g. 100) is reached
+  - Convert the buffer to database compliant reverse-index
+  - Flush the converted buffer to database
+  - Send acknowledgement of the whole buffer to RabbitMQ
 
 _Architectural Effects:_
 
@@ -119,24 +119,32 @@ _Architectural Effects:_
 
 #### Database
 
-We use [Postgres](https://www.postgresql.org/) to store our search index.  
+We use [Postgres](https://www.postgresql.org/) to store our search index.
 
-The database would have 3 tables:
+The database has 3 tables:
+
 - `websites`
 - `keywords`
 - `relations`
 
-The database should be optimized using [indexes](https://www.postgresql.org/docs/current/indexes.html) to speed up search queries.  
-The database schema is found in [../postgres.sql](../postgres.sql).
-
+The database is optimized using [indexes](https://www.postgresql.org/docs/current/indexes.html) to speed up search queries.  
+The database schema is found in [../indexer/../db.go](../indexer/internal/db/db.go).
 
 _Architectural Effects:_
- 
--- Reduces scalability, because it's a relational database and it doesn't scale horizontally. We could use [CockroachDB](https://www.cockroachlabs.com/) or [Cassandra](https://cassandra.apache.org/_/index.html) to make it distributed. However, these are not a familiar technologies for us, and we want to get a functional service up as quickly as possible.
+
+-- Reduces scalability, because it's a relational database and it doesn't scale horizontally. We could use [CockroachDB](https://www.cockroachlabs.com/) or [Cassandra](https://cassandra.apache.org/_/index.html) to make it distributed. However, these are not a familiar technologies for us, and we want to get a functional service up as quickly as possible. Therefore in current state of this project main bottlneck is the database.
 
 #### IDF
 
-to do...
+We use [TF-IDF](https://en.wikipedia.org/wiki/Tf%E2%80%93idf) along relevance of words when scoring the search results. Term frequency (TF) is calculated by the crawler, but IDF is calculated as separate cron job due to it requiring more computing power. Prefarrably IDF calculations would run at night.
+
+The calculations are done in batch sizes of `1 000 000` to reduce the size of one commit.
+
+_Architectural Effects:_
+
+++ Reduces load on database due to not having to recalculate IDF for each relation every time new data is inserted
+-- Further increases system complexity
+-- Requires a lot of CPU power during calculations
 
 ### Serving
 
@@ -145,7 +153,7 @@ Serving has two parts: an API, and a Client.
 
 #### API
 
-The API is supposed to serve as the only public entrypoint into the application. It handles incoming http requests, and queries the database for results. It also might have some data processing if needed. 
+The API is supposed to serve as the only public entrypoint into the application. It handles incoming http requests, and queries the database for results. It also might have some data processing if needed.
 
 The API is implemented as a simple REST API, with one GET endpoint: `/search`.  
 The endpoint takes the search query in a query parameter `q` with URI normalization applied to it.
@@ -153,19 +161,28 @@ The endpoint takes the search query in a query parameter `q` with URI normalizat
 For example, when searching for "cat pictures", the query would be like this:
 
 ```
-/serch?q=cat+pictures
+/search?q=cat+pictures
 ```
 
 It queries the Postgres database for search results, and returns them as a JSON response like this:
 
-```
+```json
 {
   "results": [
-    { "url": "https://www.catoftheday.com/", ... },
+    {
+      "url": "https://www.catoftheday.com/",
+      "title": "Cat of the day",
+      "score": 0.456542,
+      "keywords": [
+        "cat",
+        ...
+      ]
+    },
     { "url": "https://www.reddit.com/r/catpictures/", ...},
     ...
   ],
-  "query_time": "0.0000001s",
+  "query_time": "0.031s",
+  "total_hits": 20,
   ...
 }
 
@@ -173,9 +190,9 @@ It queries the Postgres database for search results, and returns them as a JSON 
 
 #### Client
 
-The Client is a simple static web application, that queries our API for search results, and presents them nicely. Before we have formed the index, it is used as notice (which the crawlers point to) for websites to inform about what the web traffic is about. 
+The Client is a simple static web application, that queries our API for search results, and presents them nicely. Before we have formed the index, it is used as notice (which the crawlers point to) for websites to inform about what the web traffic is about.
 
-The Client is implemented using the [Astro](https://astro.build/) framework, and it is hosted on [GitHub Pages](https://pages.github.com/).  
+The Client is implemented using the [Astro](https://astro.build/) framework, and it is hosted on [GitHub Pages](https://pages.github.com/).
 
 It is available at https://ronituohino.github.io/swap/.
 
