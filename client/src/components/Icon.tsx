@@ -3,5 +3,5 @@ type IconProps = {
 };
 
 export function Icon(props: IconProps) {
-  return <img src="/favicon.ico" alt="" class={props.class} />;
+  return <img src="/swap/favicon.ico" alt="" class={props.class} />;
 }

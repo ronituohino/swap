@@ -1,5 +1,3 @@
-import spinnerImg from "./spinner.webp";
-
 type SpinnerProps = {
   class?: string;
   ariaLabel?: string;
@@ -7,12 +5,6 @@ type SpinnerProps = {
 
 export function Spinner(props: SpinnerProps) {
   return (
-    <img
-      src={spinnerImg.src}
-      width={spinnerImg.width}
-      height={spinnerImg.height}
-      alt={props.ariaLabel}
-      class={props.class}
-    />
+    <img src="/swap/spinner.webp" alt={props.ariaLabel} class={props.class} />
   );
 }
