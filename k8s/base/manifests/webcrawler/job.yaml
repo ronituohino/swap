@@ -7,8 +7,8 @@ metadata:
 spec:
   ttlSecondsAfterFinished: 60
   suspend: false
-  completions: 1
-  parallelism: 1
+  completions: 3
+  parallelism: 3
   template:
     metadata:
       labels:
@@ -17,11 +17,9 @@ spec:
       containers:
         - name: webcrawler
           image: WEBCRAWLER-IMAGE
-          #args:
-          #- -s
-          #- CLOSESPIDER_PAGECOUNT=100
-          #- -s
-          #- CLOSESPIDER_TIMEOUT=60
+          args:
+            - -s
+            - CLOSESPIDER_TIMEOUT=60 # Runs only 60s before closing
           envFrom:
             - configMapRef:
                 name: rabbitmq-configmap

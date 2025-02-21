@@ -1,4 +1,4 @@
-# Web crawler
+# Web Crawler
 
 ## Prerequisites
 
@@ -15,8 +15,6 @@
 
 #### Additional arguments
 
-- `-a start_urls="<site1>|<site2>|<etc.>"`
-- `-a categories="<category>:<keyword1>,<keyword2>|category1:<keyword1>,<keyword2>|<etc.>"`
 - `-s CLOSESPIDER_PAGECOUNT=<pages>`
 - `-s CLOSESPIDER_ITEMCOUNT=<items>`
 - `-s CLOSESPIDER_TIMEOUT=<seconds>`

@@ -14,7 +14,13 @@ A simple search engine for the internet. Built for scalability using Kubernetes.
 
 ## Development
 
-- [k8s setup](./k8s/README.md)
+- [Kubernetes](./k8s/README.md)
+
+#### Individually
+
+Running individually requires adding proper environment variables. Starting required services such as PostgreSQL and RabbitMQ might also be required. Therefore it is recommended to use local Kubernetes development environment.
+
 - [API](./api/README.md)
 - [Indexer](./indexer/README.md)
+- [Client](./client/README.md)
 - [Crawler](./webcrawler/README.md)

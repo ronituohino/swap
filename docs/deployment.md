@@ -18,14 +18,6 @@ permissions with
 GRANT SELECT ON keywords, relations, websites TO db_user;
 ```
 
-In addition, to speed up the query time, we had to manually create some indexes
-(these are done automatically by the indexer in the Kubernetes cluster)
-
-```
-CREATE INDEX IF NOT EXISTS idx_relations_keyword_id ON relations (keyword_id);
-CREATE INDEX IF NOT EXISTS idx_relations_website_id ON relations (website_id);
-```
-
 Furthermore, Aiven forces `SSL Mode = require`, so we had to manually export the
 CA cert, and configure it for the API process.
 

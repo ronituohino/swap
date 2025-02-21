@@ -1,4 +1,6 @@
-# K8S
+# Kubernetes
+
+This is an development version only!
 
 ## Prerequisites
 
@@ -7,11 +9,11 @@
 - k3d (v5.7.5)
 - helm (v3.16.2)
 - helmfile (v1.0.0-rc.8)
+  - After install do: `helmfile init`
 
 ## Installation
 
 - `k3d cluster create --config k3d-cluster.yaml`
-- `helmfile -e dev init`
 - `helmfile -e dev apply`
 - `chmod +x ./local-deploy.sh && ./local-deploy.sh`
 
@@ -26,6 +28,6 @@
 - `helmfile deps`
 - `helmfile sync`
 
-#### Kustomization or source changes changes
+#### Kustomization or source changes
 
 - `./local-deploy.sh`

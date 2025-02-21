@@ -1,4 +1,4 @@
-# indexer
+# Indexer
 
 ## Prerequisites
 
