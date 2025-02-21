@@ -1,6 +1,6 @@
 ---
 // Supports weights 200-900
-import '@fontsource-variable/nunito';
+import "@fontsource-variable/nunito";
 
 const title = "SWAP Search";
 const description =
@@ -9,89 +9,104 @@ const description =
 
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		{/* link rel="manifest" href="/manifest.json" /> mobile icons */}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {/* link rel="manifest" href="/manifest.json" /> mobile icons */}
     <link rel="canonical" href="https://ronituohino.github.io/swap" />
 
-		<title>{title}</title>
-		<meta name="description" content={description} />
-		<link rel="icon" type="image/x-icon"href="/swap/favicon.ico" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/x-icon" href="/swap/favicon.ico" />
 
-		{/* Og metadata */}
-		<meta property="og:title" content={title} />
+    {/* Og metadata */}
+    <meta property="og:title" content={title} />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://ronituohino.github.io/swap" />
-		<meta property="og:locale" content="en_US" />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:site_name" content={title} />
     <meta property="og:description" content={description} />
 
-		<meta name="generator" content={Astro.generator} />
-	</head>
-	<body>
-		<main>
-			<slot />
-		</main>
-	</body>
+    <meta name="generator" content={Astro.generator} />
+  </head>
+  <body>
+    <slot />
+  </body>
 </html>
 
 <style is:global>
-	* {
-		box-sizing: border-box;
-		margin: 0;
-		padding: 0;
-		border: 0;
-	}
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
 
-	ul,
-	li {
-		list-style-type: none;
-	}
+  ul,
+  li {
+    list-style-type: none;
+  }
 
-	button {
-		cursor: pointer;
-	}
+  button {
+    cursor: pointer;
+  }
 
-	a {
-		text-decoration: none;
-		color: var(--link-col);
-	}
-	a:visited {
-		color: var(--link-visited-col);
-	}
-	a:hover,
-	a:focus-visible {
-		color: var(--link-hover-col);
-	}
-	a:active {
-		color: var(--link-active-col);
-	}
+  a {
+    text-decoration: none;
+    color: var(--link-col);
+  }
+  a:visited {
+    color: var(--link-visited-col);
+  }
+  a:hover,
+  a:focus-visible {
+    color: var(--link-hover-col);
+  }
+  a:active {
+    color: var(--link-active-col);
+  }
 
-	img {
-		height: auto;
-		max-width: 100%;
-		vertical-align: middle;
-		font-style: italic;
-	}
+  img {
+    height: auto;
+    max-width: 100%;
+    vertical-align: middle;
+    font-style: italic;
+  }
 </style>
 
 <style>
-	:root {
-		--bg-col: #252525;
+  :root {
+    --bg-col: #252525;
+    --bg-focus: #333;
+    --bg-active: #444;
+    --white: rgb(240, 240, 240);
+    --gray: rgb(150, 150, 150);
 
-		color: rgb(20, 20, 20);
-rgb(226, 226, 226)
-		--link-col: rgb(0, 17, 252);
-		--link-visited-col: rgb(121, 0, 219);
-		--link-hover-col: rgb(51, 65, 255);
-		--link-active-col: rgb(109, 119, 255);
-	}
+    color: var(--white);
+    --link-col: rgb(205, 205, 205);
+    --link-visited-col: rgb(208, 150, 255);
+    --link-hover-col: rgb(186, 191, 255);
+    --link-active-col: rgb(102, 112, 251);
+  }
 
-	html {
-		font-family: 'Nunito Variable', sans-serif;
-	}
-	body {
-		background-color: var(--bg-col);
-	}
+  html {
+    font-family: "Nunito Variable", sans-serif;
+  }
+  body {
+    background-color: var(--bg-col);
+    --dot-col: rgb(59, 59, 59);
+    --dot-size: 1px;
+    background-image: radial-gradient(
+        var(--dot-col) var(--dot-size),
+        transparent var(--dot-size)
+      ),
+      radial-gradient(
+        var(--dot-col) var(--dot-size),
+        var(--bg-col) var(--dot-size)
+      );
+    background-size: 20px 20px;
+    background-position:
+      0 0,
+      10px 10px;
+  }
 </style>

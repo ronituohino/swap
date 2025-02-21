@@ -1,8 +1,8 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import SearchBar from '../components/SearchBar.astro';
+import Layout from "../layouts/Layout.astro";
+import { Search } from "../components/Search";
 ---
 
 <Layout>
-		<SearchBar />
+  <Search client:only />
 </Layout>
