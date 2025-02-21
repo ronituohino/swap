@@ -125,19 +125,24 @@ export function Search() {
         }}
         class="search-bar"
       >
-        <input type="text" name="query" class="search-input" />
+        <input
+          type="text"
+          name="query"
+          aria-label="Input search query"
+          class="search-input"
+        />
         <button class="button" type="submit" aria-label="Search">
           <Icon />
         </button>
       </form>
 
-      <div class="search-results">
+      <div class="search-results" aria-live="polite">
         <Switch>
           <Match when={searchResults.error}>
             <span>Error: {searchResults.error.message}</span>
           </Match>
           <Match when={searchResults.loading}>
-            <Spinner class="spinner" />
+            <Spinner ariaLabel="Searching..." class="spinner" />
           </Match>
           <Match when={isEmptyResult(searchResults())}>
             <span class="no-result">No results found.</span>
