@@ -3,17 +3,17 @@ kind: Kustomization
 
 images:
   - name: API-IMAGE
-    newName: ronituohino/swap-search
-    newTag: api
+    newName: swap/api
+    newTag: uuid
   - name: IDF-IMAGE
-    newName: ronituohino/swap-search
-    newTag: idf
+    newName: swap/idf
+    newTag: uuid
   - name: INDEXER-IMAGE
-    newName: ronituohino/swap-search
-    newTag: indexer
+    newName: swap/indexer
+    newTag: uuid
   - name: WEBCRAWLER-IMAGE
-    newName: ronituohino/swap-search
-    newTag: webcrawler
+    newName: swap/webcrawler
+    newTag: uuid
 
 resources:
   - manifests/api/deployment.yaml
