@@ -26,22 +26,26 @@ echo ""
 echo "Building and pushing API image..."
 docker build --tag swap/api:$UUID ../api/
 k3d image import swap/api:$UUID -c swap-cluster
+docker rmi swap/api:$UUID
 
 echo ""
 echo "Building and pushing IDF image..."
 docker build --tag swap/idf:$UUID ../idf/
 k3d image import swap/idf:$UUID -c swap-cluster
+docker rmi swap/idf:$UUID
 
 echo ""
 echo "Building and pushing Indexer image..."
 docker build --tag swap/indexer:$UUID ../indexer/
 k3d image import swap/indexer:$UUID -c swap-cluster
+docker rmi swap/indexer:$UUID
 
 if [ "$WEBCRAWLER_ENABLED" = true ]; then
   echo ""
   echo "Building and pushing Webcrawler image..."
   docker build --tag swap/webcrawler:$UUID ../webcrawler/
   k3d image import swap/webcrawler:$UUID -c swap-cluster
+  docker rmi swap/webcrawler:$UUID
 else
   echo ""
   echo "Skipping Webcrawler build and push..."
