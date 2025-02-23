@@ -20,6 +20,7 @@ This is an development version only!
 ## Running crawler
 
 - `./local-deploy.sh -w` - uses args defined in [webcrawler job](../k8s/base/manifests/webcrawler/job.yaml)
+  - Let it run for 60s ([timeout defined here](./base/manifests/webcrawler/job.yaml)) and open e.g. http://localhost:8081/search?q=cat+pictures
 
 ## Updating cluster
 
