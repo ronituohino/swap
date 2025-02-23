@@ -199,7 +199,9 @@ It is available at https://ronituohino.github.io/swap/.
 
 ### Infrastructure
 
-Setting up the infrastructure for this kind of project requires some work, but preplanning properly what services handle certain tasks helps a lot. Because of the preplanning, we were able to divide tasks and develop them individually using tools of our choice. The infrastructure we chose ended up being quite performant, and the main bottleneck currently is the non-distributed database.
+Setting up the infrastructure for this kind of project requires some work, but preplanning properly what services handle certain tasks helps a lot. Because of the preplanning, we were able to divide tasks and develop them individually. This flexibility in infrastructure allows us to use tools of our choice, which can be seen in the variety of languages used in the project: Go, Python, TypeScript, Shell and PLpgSQL.
+
+The infrastructure we chose ended up being quite performant, and the main bottleneck currently is the non-distributed database. Performant refers to scalability in this case as its easy scale them horizontally.
 
 ### Tools
 
@@ -219,7 +221,7 @@ Data management ended up being one of the hardest parts of this project. We crea
 
 Surprisingly, a lot of data fits into the index while maintaining reasonable disk usage.
 
-Our next problem was that queries took a lot of time. The following numbers are when using a free-tier hosting provider with only one CPU available. When searching `Los Angeles` the search took `~8.83s`. We ended up adding database indexes for the relations table which resulted in the same query taking `~2.83s`, and increasing the relations index size by `236MB`.
+Our next problem was that queries took a lot of time. The following numbers are when using a free-tier hosting provider with only one CPU available. When searching `Los Angeles` the search took `~8.83s`. We ended up adding database indexes for the relations table on the `website_id` and `keyword_id` columns, which resulted in the same query taking `~2.83s`, and increasing the relations index size by `236MB`.
 
 | Table name | Total count | Total size | Table size | Index size |
 | ---------- | ----------- | ---------- | ---------- | ---------- |
