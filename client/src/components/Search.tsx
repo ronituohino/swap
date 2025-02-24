@@ -8,11 +8,9 @@ import {
   createSignal,
   onMount,
 } from "solid-js";
-
-import { Spinner } from "./Spinner.tsx";
+import { Icon } from "./Icon.tsx";
 
 import "./Search.css";
-import { Icon } from "./Icon.tsx";
 
 const SEARCH_API_URL = "https://api-nqknowvima-lz.a.run.app/search";
 
@@ -132,7 +130,7 @@ export function Search() {
           class="search-input"
         />
         <button class="button" type="submit" aria-label="Search">
-          <Icon />
+          <Icon src="/swap/search.webp" class="search-icon" />
         </button>
       </form>
 
@@ -142,7 +140,11 @@ export function Search() {
             <span>Error: {searchResults.error.message}</span>
           </Match>
           <Match when={searchResults.loading}>
-            <Spinner ariaLabel="Searching..." class="spinner" />
+            <Icon
+              src="/swap/spinner.webp"
+              ariaLabel="Searching..."
+              class="spinner"
+            />
           </Match>
           <Match when={isEmptyResult(searchResults())}>
             <span class="no-result">No results found.</span>

@@ -1,7 +1,11 @@
 type IconProps = {
+  src: string;
   class?: string;
+  ariaLabel?: string;
 };
 
 export function Icon(props: IconProps) {
-  return <img src="/swap/favicon.ico" alt="" class={props.class} />;
+  return (
+    <img src={props.src} alt={props.ariaLabel || ""} class={props.class} />
+  );
 }
