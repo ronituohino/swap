@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/base64"
 	"fmt"
 	"os"
 	"strings"
@@ -29,13 +30,28 @@ func Initialize() *pg.DB {
 	fmt.Println("Connecting to Postgres database")
 
 	// Load CA cert if given
-	ca_path, ca_cert_defined := os.LookupEnv("CA_PATH")
+	ca_env, ca_env_defined := os.LookupEnv("CA_CERT")
+	ca_path, ca_path_defined := os.LookupEnv("CA_PATH")
+
 	var tlsConfig *tls.Config
-	if ca_cert_defined {
-		caCert, err := os.ReadFile(ca_path)
-		if err != nil {
-			panic(fmt.Sprintf("failed to read CA certificate: %v", err))
+
+	if ca_path_defined || ca_env_defined {
+		var caCert []byte
+		if ca_path_defined {
+			var err error
+			caCert, err = os.ReadFile(ca_path)
+			if err != nil {
+				panic(fmt.Sprintf("failed to read CA certificate: %v", err))
+			}
 		}
+		if ca_env_defined {
+			data, err := base64.StdEncoding.DecodeString(ca_env)
+			if err != nil {
+				panic(fmt.Sprintf("failed to decode CA certificate: %v", err))
+			}
+			caCert = data
+		}
+
 		caCertPool := x509.NewCertPool()
 		caCertPool.AppendCertsFromPEM(caCert)
 

@@ -12,7 +12,8 @@ import { Icon } from "./Icon.tsx";
 
 import "./Search.css";
 
-const SEARCH_API_URL = "https://api-nqknowvima-lz.a.run.app/search";
+const SEARCH_API_URL =
+  "https://searchengine5hbpj8uu-search-engine-api.functions.fnc.fr-par.scw.cloud/search";
 
 type SearchResults = {
   results: SearchHits[];
