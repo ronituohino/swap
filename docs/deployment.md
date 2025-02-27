@@ -23,8 +23,12 @@ CA cert, and configure it for the API process.
 
 ## API
 
-The live API process is deployed on
+The live API process was deployed on
 [Cloud Run](https://cloud.google.com/run?hl=en).
+
+However, now it's live in [Scaleway Serverless Containers](https://www.scaleway.com/en/serverless-containers/).
+
+#### Cloud Run Setup
 
 We built a new Docker image with the following naming schema to push it to the
 [Artifact Registry](https://cloud.google.com/artifact-registry/docs)
@@ -36,6 +40,16 @@ We built a new Docker image with the following naming schema to push it to the
 The CA certificate is stored in
 [Secrets Manager](https://cloud.google.com/security/products/secret-manager?hl=en),
 and it is mounted to the Docker container in Cloud Run.
+
+#### Scaleway Setup
+
+We added support for defining the CA cert as a base64 encoded env variable. This makes deployment easier, and we don't have to pay for secret management.
+
+We built a new Docker image with the following structure to push it to [Scaleway Container Registry](https://www.scaleway.com/en/container-registry/):
+
+```
+rg.fr-par.scw.cloud/<scw namespace>/<image name>:<tag>
+```
 
 ## Client
 
