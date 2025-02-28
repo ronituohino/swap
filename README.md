@@ -7,18 +7,18 @@ A simple search engine for the internet. Built for scalability using Kubernetes.
 [Roni Tuohino](https://github.com/ronituohino)  
 [Perttu Kangas](https://github.com/DeeCaaD)
 
-## Documentation and Course Report
+## Documentation
 
-- [Architecture and Course Report](./docs/architecture.md)
+- [Course Report and Architecture](./docs/report.md)
 - [Deployment](./docs/deployment.md)
 
 ## Development
 
 - [Kubernetes](./k8s/README.md)
 
-#### Individually
+### Running Services Individually
 
-Running individually requires adding proper environment variables. Starting required services such as PostgreSQL and RabbitMQ might also be required. Therefore it is recommended to use local Kubernetes development environment.
+Running services individually requires defining environment variables. Also, some services like the Crawler or Indexer depend on other services such as PostgreSQL and RabbitMQ. Therefore, it is recommended to use local Kubernetes development environment which starts up everything locally.
 
 - [API](./api/README.md)
 - [Indexer](./indexer/README.md)

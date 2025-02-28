@@ -1,6 +1,15 @@
-# Architecture Description and Course Report
+# Search Engine
 
-This document describes the architecture of the search engine and serves as a course report.
+This document serves as a course report with a focus on the architecture, and the architectual decisions, of the search engine.
+
+- Roni Tuohino
+- Perttu Kangas
+
+(Who wrote what)
+
+(Structure)
+
+Introduction, Experimentation Setup, Observations, Lessons Learned and Conclusions
 
 ## Introduction
 
@@ -204,7 +213,7 @@ It is available at https://ronituohino.github.io/swap/.
 
 The crawler `USER_AGENT` field points to this website to inform what our crawling traffic is about. It is a good manner to identify your crawlers for website owners. Before we formed the index, our site was used as a notice for the websites we were crawling.
 
-## Observations, Lessons learned and Conclusions
+## Observations, Lessons Learned and Conclusions
 
 ### Infrastructure
 
@@ -247,3 +256,11 @@ Processing data in bulks is usually better if there is a lot of data moving arou
 In the first version of the Indexer, when it received a message from RabbitMQ, it instantly inserted the message into the database. When we started 3 indexers, 3 web crawlers, and 3 RabbitMQ instances in parallel we got Postgres constantly throwing errors about deadlocks.
 
 To reduce this we added a message buffer and flush timer. Now it processes `100` messages or waits for `30s` before inserting them into the database in bulk. The messages are acknowledged to RabbitMQ by the indexer after all of them are inserted into the database. Therefore either all of them succeed or all fail. Postgres threw less errors in this implementation, however they did not go away entirely.
+
+### Search Result Quality
+
+Overall, the search result quality is quite low. For example, when searching for "mario bros", the main result is a personal web page for someone, who has included his name "Mario" in multiple semantic elements. We would need a better approach than Bag of Words, because the context is lost between "mario" and "bros". The results do contain a link to the "Super Mario Bros" -movie, but it's ranked quite low in the results.
+
+There are more reasons for poor search results. It's quite difficult to estimate the quality of the results, and we cannot really provide solid statistics on "how much they have improved with each step". This makes it difficult to improve on, because it's more "feeling based". We tried to work on the results quality by adjusting the heuristics a bit and just going by a few queries to see how the adjustments impacted the final scores. Another reason is that we only got to try the entire search engine flow at a very late stage of development, so we didn't have much time to improve the system. Overall, this ended up being a big challenge for us.
+
+We can say that the search results improved a lot by adding the TF-IDF metric. We believe that [PageRank](https://fi.wikipedia.org/wiki/PageRank) would be a great improvement to the system by emphasizing websites which are actually relevant. This would be the logical next step in development by adding a PageRank service to the system which is run periodically similar to the IDF service. Furthermore, a proper search result quality testing framework would be great to get a more objective measure to the system. In addition, the relevance score metrics need further adjustment.
