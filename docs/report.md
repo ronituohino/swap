@@ -22,7 +22,7 @@ This document serves as a course report with a focus on the architecture, and th
 - [Observations, Lessons Learned and Conclusions](#observations-lessons-learned-and-conclusions)
   - [Infrastructure](#infrastructure)
   - [Tools](#tools)
-  - [Data management](#data-management)
+  - [Data Management](#data-management)
   - [Buffers](#buffers)
   - [Search Result Quality](#search-result-quality)
 
@@ -32,21 +32,22 @@ We are building a general search engine that indexes pages from the internet. Th
 
 The design of the search engine follows the Microservices pattern language, with inherent traits of scalability and modularity. We are heavily utilizing [Docker](https://www.docker.com/) and [Kubernetes](https://kubernetes.io/) to containerize our services and orchestrate the application. This allows us to develop each service independently from each other and use whatever technologies we see fit for each task. Furthermore, it helps us divide development tasks because there are clear boundaries between each service.
 
-Contributions section roughly explains division of work in the project.  
-The experimentation setup section describes the roles of each service of the search engine in detail and the reasoning behind architectural choices.  
-In the end, we will also list observations, conclusions, and lessons learned from this project.
+This document is divided into three sections. Contributions section roughly explains division of work in the project. The experimentation setup section describes the roles of each service of the search engine in detail and the reasoning behind architectural choices. In the end, we also list observations, conclusions, and lessons learned from this project.  
 
 ## Contributions
 
-Some services were created collaboratively, and preplanning, observations, lessons learned, and conclusions were discussed together. However, each of us had specific focus points within the project:
+Most of the work in this project was created collaboratively. This includes preplanning, most of the services, and course report. However we did have focus points within the project:
 
 **Roni:**
-- Came up with the idea of the search engine and did most of the preplanning.
-- Main focus was on creating the webcrawler logic, developing the client, and writing the report.
+- Came up with the idea of the search engine and did most of the initial research.
+- Web crawler data processing logic.
+- Developed the client.
+- Initial structure for the report.
 
 **Perttu:**
-- Implemented the preplanned infrastructure into Kubernetes.
-- Main focus was on ensuring the project worked end-to-end and created the IDF calculator.
+- Implemented the infrastructure into Kubernetes.
+- Ensured the project worked end-to-end (integration).
+- Created the IDF calculator.
 
 More specific divison of work can be found from the [commit history](https://github.com/ronituohino/swap/commits).
 
@@ -257,7 +258,7 @@ Searching up tools can speed up the development. For example, first we were goin
 
 Using tools like Copilot can speed up the development if used correctly. One must understand the changes it suggests before pressing "Accept". They can also help developers by pushing them in the right direction in solving problems.
 
-### Data management
+### Data Management
 
 Data management ended up being the most difficult part of this project. We created our index by scraping the internet for `~4hr` using only **one** web crawler and indexer with the following results:
 
