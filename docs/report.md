@@ -5,11 +5,26 @@ This document serves as a course report with a focus on the architecture, and th
 - Roni Tuohino
 - Perttu Kangas
 
-(Who wrote what)
+## Table of Contents
 
-(Structure)
-
-Introduction, Experimentation Setup, Observations, Lessons Learned and Conclusions
+- [Introduction](#introduction)
+- [Contributions](#contributions)
+- [Experimentation Setup](#experimentation-setup)
+  - [Indexing](#indexing)
+    - [Crawler](#crawler)
+    - [RabbitMQ](#rabbitmq)
+    - [Indexer](#indexer)
+    - [Database](#database)
+    - [IDF](#idf)
+  - [Serving](#serving)
+    - [API](#api)
+    - [Client](#client)
+- [Observations, Lessons Learned and Conclusions](#observations-lessons-learned-and-conclusions)
+  - [Infrastructure](#infrastructure)
+  - [Tools](#tools)
+  - [Data management](#data-management)
+  - [Buffers](#buffers)
+  - [Search Result Quality](#search-result-quality)
 
 ## Introduction
 
@@ -17,8 +32,23 @@ We are building a general search engine that indexes pages from the internet. Th
 
 The design of the search engine follows the Microservices pattern language, with inherent traits of scalability and modularity. We are heavily utilizing [Docker](https://www.docker.com/) and [Kubernetes](https://kubernetes.io/) to containerize our services and orchestrate the application. This allows us to develop each service independently from each other and use whatever technologies we see fit for each task. Furthermore, it helps us divide development tasks because there are clear boundaries between each service.
 
+Contributions section roughly explains division of work in the project.  
 The experimentation setup section describes the roles of each service of the search engine in detail and the reasoning behind architectural choices.  
 In the end, we will also list observations, conclusions, and lessons learned from this project.
+
+## Contributions
+
+Some services were created collaboratively, and preplanning, observations, lessons learned, and conclusions were discussed together. However, each of us had specific focus points within the project:
+
+**Roni:**
+- Came up with the idea of the search engine and did most of the preplanning.
+- Main focus was on creating the webcrawler logic, developing the client, and writing the report.
+
+**Perttu:**
+- Implemented the preplanned infrastructure into Kubernetes.
+- Main focus was on ensuring the project worked end-to-end and created the IDF calculator.
+
+More specific divison of work can be found from the [commit history](https://github.com/ronituohino/swap/commits).
 
 ## Experimentation Setup
 
